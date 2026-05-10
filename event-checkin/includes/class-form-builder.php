@@ -433,8 +433,9 @@ class Form_Builder {
             $wpdb->prepare( "SELECT title FROM {$wpdb->prefix}ec_events WHERE id = %d", $event_id )
         );
 
-        $hide_header = ! empty( $_POST['hide_header'] ) ? '1' : '1'; // Kiosk defaults to hidden.
-        $hide_footer = ! empty( $_POST['hide_footer'] ) ? '1' : '1';
+        // Kiosk defaults to hiding header/footer. Only show if explicitly set to 0.
+        $hide_header = isset( $_POST['hide_header'] ) && $_POST['hide_header'] === '0' ? '0' : '1';
+        $hide_footer = isset( $_POST['hide_footer'] ) && $_POST['hide_footer'] === '0' ? '0' : '1';
 
         $page_id = wp_insert_post( array(
             'post_title'   => sprintf( __( 'Kiosk: %s', 'event-checkin' ), $event ? $event->title : 'Event' ),

@@ -418,19 +418,30 @@
         },
 
         applyTranslation: function(trans) {
-            // Translate labels, placeholders, and button text.
+            // Use data-original-text attributes to always look up the English key,
+            // regardless of what language the label is currently in.
+
+            // Translate labels.
             $('.ec-ff-label').each(function() {
-                var original = $(this).text().replace(' *', '').trim();
-                if (trans[original]) {
-                    var isRequired = $(this).text().indexOf('*') !== -1;
-                    $(this).text(trans[original] + (isRequired ? ' *' : ''));
+                var $el = $(this);
+                if (!$el.data('original-text')) {
+                    $el.data('original-text', $el.text().replace(' *', '').trim());
+                    $el.data('is-required', $el.text().indexOf('*') !== -1);
+                }
+                var key = $el.data('original-text');
+                if (trans[key]) {
+                    $el.text(trans[key] + ($el.data('is-required') ? ' *' : ''));
                 }
             });
 
             // Translate step titles.
             $('.ec-form-step-title').each(function() {
-                var original = $(this).text().trim();
-                if (trans[original]) $(this).text(trans[original]);
+                var $el = $(this);
+                if (!$el.data('original-text')) {
+                    $el.data('original-text', $el.text().trim());
+                }
+                var key = $el.data('original-text');
+                if (trans[key]) $el.text(trans[key]);
             });
 
             // Translate button labels.
@@ -445,17 +456,25 @@
 
             // Translate placeholders.
             $('input[placeholder], textarea[placeholder]').each(function() {
-                var original = $(this).attr('placeholder');
-                if (original && trans[original]) {
-                    $(this).attr('placeholder', trans[original]);
+                var $el = $(this);
+                if (!$el.data('original-placeholder')) {
+                    $el.data('original-placeholder', $el.attr('placeholder'));
+                }
+                var key = $el.data('original-placeholder');
+                if (key && trans[key]) {
+                    $el.attr('placeholder', trans[key]);
                 }
             });
 
             // Translate select option labels.
             $('select option').each(function() {
-                var original = $(this).text().trim();
-                if (original && trans[original]) {
-                    $(this).text(trans[original]);
+                var $el = $(this);
+                if (!$el.data('original-text')) {
+                    $el.data('original-text', $el.text().trim());
+                }
+                var key = $el.data('original-text');
+                if (key && trans[key]) {
+                    $el.text(trans[key]);
                 }
             });
         },

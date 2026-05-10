@@ -40,6 +40,9 @@ spl_autoload_register( function ( $class ) {
  */
 function ec_activate() {
     require_once EC_PLUGIN_DIR . 'includes/class-activator.php';
+    require_once EC_PLUGIN_DIR . 'includes/class-roles.php';
+    require_once EC_PLUGIN_DIR . 'includes/class-verification.php';
+    require_once EC_PLUGIN_DIR . 'includes/class-settings.php';
     EventCheckin\Activator::activate();
 }
 register_activation_hook( __FILE__, 'ec_activate' );
@@ -79,6 +82,7 @@ add_action( 'plugins_loaded', function () {
     EventCheckin\Admin::init();
     EventCheckin\Rest_API::init();
     EventCheckin\Registration::init();
+    EventCheckin\Export::init();
     EventCheckin\Checkin::init();
     EventCheckin\Form_Builder::init();
     EventCheckin\Form_Renderer::init();

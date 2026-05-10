@@ -254,5 +254,4 @@ class Export {
     }
 }
 
-// Hook the export handler outside the class init for admin-post.
-add_action( 'admin_post_ec_export', array( '\EventCheckin\Export', 'handle_export' ) );
+

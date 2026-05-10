@@ -254,15 +254,52 @@ class Registration {
             }
         }
 
-        $event_id   = absint( $_POST['event_id'] ?? 0 );
+        $event_id = absint( $_POST['event_id'] ?? 0 );
+
+        // Support both old field names (first_name, email) and new form builder names (ecf_field_*).
         $first_name = sanitize_text_field( $_POST['first_name'] ?? '' );
         $last_name  = sanitize_text_field( $_POST['last_name'] ?? '' );
         $email      = Security::validate_email( $_POST['email'] ?? '' );
         $phone      = sanitize_text_field( $_POST['phone'] ?? '' );
 
+        // If new form builder fields are present, extract from ecf_ prefixed fields.
+        if ( empty( $first_name ) || empty( $email ) ) {
+            $first_name = $first_name ?: sanitize_text_field( $_POST['ecf_field_first_name'] ?? '' );
+            $last_name  = $last_name ?: sanitize_text_field( $_POST['ecf_field_last_name'] ?? '' );
+            $phone      = $phone ?: sanitize_text_field( $_POST['ecf_field_phone'] ?? '' );
+
+            // Try to find email from any ecf_ field.
+            if ( ! $email ) {
+                $email = Security::validate_email( $_POST['ecf_field_email'] ?? '' );
+            }
+
+            // Scan all POST keys for ecf_ prefixed email/name fields from custom schemas.
+            if ( ! $email || ! $first_name ) {
+                foreach ( $_POST as $key => $value ) {
+                    if ( strpos( $key, 'ecf_' ) !== 0 ) {
+                        continue;
+                    }
+                    $val = sanitize_text_field( $value );
+                    // Auto-detect email fields by value format.
+                    if ( ! $email && is_email( $val ) ) {
+                        $email = sanitize_email( $val );
+                    }
+                }
+            }
+        }
+
         // Validate required fields.
-        if ( ! $event_id || ! $first_name || ! $last_name || ! $email ) {
-            wp_send_json_error( array( 'message' => __( 'Please fill in all required fields.', 'event-checkin' ) ), 400 );
+        if ( ! $event_id || ! $email ) {
+            wp_send_json_error( array( 'message' => __( 'Please fill in all required fields (at minimum, email is required).', 'event-checkin' ) ), 400 );
+        }
+
+        // Use email local part as name fallback if not provided.
+        if ( empty( $first_name ) ) {
+            $email_parts = explode( '@', $email );
+            $first_name  = ucfirst( $email_parts[0] );
+        }
+        if ( empty( $last_name ) ) {
+            $last_name = '';
         }
 
         global $wpdb;
@@ -315,21 +352,69 @@ class Registration {
             wp_send_json_error( array( 'message' => __( 'You are already registered for this event.', 'event-checkin' ) ), 400 );
         }
 
-        // Collect custom field data.
+        // Collect custom field data from both old and new form systems.
         $custom_data = array();
-        $custom_fields = $event->custom_fields ? json_decode( $event->custom_fields, true ) : array();
-        foreach ( $custom_fields as $field ) {
-            $key   = 'custom_' . sanitize_key( $field['label'] );
-            $value = sanitize_text_field( $_POST[ $key ] ?? '' );
 
-            if ( ! empty( $field['required'] ) && empty( $value ) ) {
-                $wpdb->query( 'ROLLBACK' );
-                wp_send_json_error( array(
-                    'message' => sprintf( __( '%s is required.', 'event-checkin' ), $field['label'] ),
-                ), 400 );
+        // New form builder: collect all ecf_ prefixed fields.
+        $form_schema = null;
+        if ( ! empty( $event->form_schema ) ) {
+            $form_schema = json_decode( $event->form_schema, true );
+        }
+
+        if ( $form_schema && ! empty( $form_schema['steps'] ) ) {
+            // New form builder mode: validate and collect from schema.
+            foreach ( $form_schema['steps'] as $step ) {
+                foreach ( $step['fields'] as $field_def ) {
+                    $field_id = $field_def['id'] ?? '';
+                    $post_key = 'ecf_' . $field_id;
+
+                    // Skip core fields already extracted (first_name, last_name, email, phone).
+                    if ( in_array( $field_id, array( 'field_first_name', 'field_last_name', 'field_email', 'field_phone' ), true ) ) {
+                        continue;
+                    }
+
+                    // Skip hidden, section_break.
+                    if ( in_array( $field_def['type'], array( 'hidden', 'section_break' ), true ) ) {
+                        continue;
+                    }
+
+                    $value = $_POST[ $post_key ] ?? '';
+
+                    // Sanitize based on field type.
+                    $value = Form_Fields::sanitize_field( $field_def, $value );
+
+                    // Validate.
+                    $validation = Form_Fields::validate_field( $field_def, $value );
+                    if ( is_wp_error( $validation ) ) {
+                        $wpdb->query( 'ROLLBACK' );
+                        wp_send_json_error( array( 'message' => $validation->get_error_message() ), 400 );
+                    }
+
+                    $label = $field_def['label'] ?? $field_id;
+                    $custom_data[ $label ] = $value;
+                }
             }
+        } else {
+            // Legacy mode: old custom_fields format.
+            $custom_fields = $event->custom_fields ? json_decode( $event->custom_fields, true ) : array();
+            if ( is_array( $custom_fields ) ) {
+                foreach ( $custom_fields as $field ) {
+                    if ( ! isset( $field['label'] ) ) {
+                        continue;
+                    }
+                    $key   = 'custom_' . sanitize_key( $field['label'] );
+                    $value = sanitize_text_field( $_POST[ $key ] ?? '' );
 
-            $custom_data[ $field['label'] ] = $value;
+                    if ( ! empty( $field['required'] ) && empty( $value ) ) {
+                        $wpdb->query( 'ROLLBACK' );
+                        wp_send_json_error( array(
+                            'message' => sprintf( __( '%s is required.', 'event-checkin' ), $field['label'] ),
+                        ), 400 );
+                    }
+
+                    $custom_data[ $field['label'] ] = $value;
+                }
+            }
         }
 
         // Generate unique QR token.

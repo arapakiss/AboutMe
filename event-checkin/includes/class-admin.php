@@ -722,6 +722,41 @@ class Admin {
                     </tr>
                 </table>
 
+                <!-- SMS Verification Section -->
+                <h2><?php esc_html_e( 'SMS Verification (Phone Fields)', 'event-checkin' ); ?></h2>
+                <p class="description"><?php esc_html_e( 'Configure an SMS provider for phone number verification in forms.', 'event-checkin' ); ?></p>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="sms_provider"><?php esc_html_e( 'SMS Provider', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <select id="sms_provider" name="sms_provider" class="ec-builder-select">
+                                <option value="" <?php selected( $settings['sms_provider'], '' ); ?>><?php esc_html_e( 'None (disabled)', 'event-checkin' ); ?></option>
+                                <option value="twilio" <?php selected( $settings['sms_provider'], 'twilio' ); ?>>Twilio</option>
+                                <option value="webhook" <?php selected( $settings['sms_provider'], 'webhook' ); ?>><?php esc_html_e( 'Custom Webhook', 'event-checkin' ); ?></option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="twilio_account_sid"><?php esc_html_e( 'Twilio Account SID', 'event-checkin' ); ?></label></th>
+                        <td><input type="text" id="twilio_account_sid" name="twilio_account_sid" value="<?php echo esc_attr( $settings['twilio_account_sid'] ); ?>" class="regular-text"></td>
+                    </tr>
+                    <tr>
+                        <th><label for="twilio_auth_token"><?php esc_html_e( 'Twilio Auth Token', 'event-checkin' ); ?></label></th>
+                        <td><input type="password" id="twilio_auth_token" name="twilio_auth_token" value="<?php echo esc_attr( $settings['twilio_auth_token'] ); ?>" class="regular-text"></td>
+                    </tr>
+                    <tr>
+                        <th><label for="twilio_from_number"><?php esc_html_e( 'Twilio From Number', 'event-checkin' ); ?></label></th>
+                        <td><input type="text" id="twilio_from_number" name="twilio_from_number" value="<?php echo esc_attr( $settings['twilio_from_number'] ); ?>" class="regular-text" placeholder="+1234567890"></td>
+                    </tr>
+                    <tr>
+                        <th><label for="sms_webhook_url"><?php esc_html_e( 'Webhook URL', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <input type="url" id="sms_webhook_url" name="sms_webhook_url" value="<?php echo esc_attr( $settings['sms_webhook_url'] ); ?>" class="regular-text">
+                            <p class="description"><?php esc_html_e( 'For custom webhook: receives POST with JSON {phone, message, code}', 'event-checkin' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
                 <!-- Email Section -->
                 <h2><?php esc_html_e( 'Email Sending', 'event-checkin' ); ?></h2>
                 <table class="form-table">

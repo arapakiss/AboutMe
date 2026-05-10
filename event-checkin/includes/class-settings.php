@@ -25,6 +25,11 @@ class Settings {
         'email_from_name'      => '',
         'email_from_address'   => '',
         'export_chunk_size'    => 500,  // rows per batch for background export.
+        'sms_provider'         => '',   // 'twilio' or 'webhook'.
+        'sms_webhook_url'      => '',
+        'twilio_account_sid'   => '',
+        'twilio_auth_token'    => '',
+        'twilio_from_number'   => '',
     );
 
     /**
@@ -213,6 +218,11 @@ class Settings {
             'email_from_name'      => $_POST['email_from_name'] ?? '',
             'email_from_address'   => $_POST['email_from_address'] ?? '',
             'export_chunk_size'    => $_POST['export_chunk_size'] ?? 500,
+            'sms_provider'         => $_POST['sms_provider'] ?? '',
+            'sms_webhook_url'      => $_POST['sms_webhook_url'] ?? '',
+            'twilio_account_sid'   => $_POST['twilio_account_sid'] ?? '',
+            'twilio_auth_token'    => $_POST['twilio_auth_token'] ?? '',
+            'twilio_from_number'   => $_POST['twilio_from_number'] ?? '',
         ) );
 
         wp_safe_redirect( admin_url( 'admin.php?page=ec-settings&updated=1' ) );

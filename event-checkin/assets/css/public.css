@@ -1,0 +1,188 @@
+/**
+ * Event Check-in - Public Registration Form Styles
+ */
+
+.ec-registration-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, sans-serif;
+}
+
+.ec-event-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.ec-event-header h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    color: #1f2937;
+}
+
+.ec-event-description {
+    color: #6b7280;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.ec-event-meta {
+    display: flex;
+    gap: 20px;
+    margin-top: 8px;
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.ec-event-meta .ec-date::before {
+    content: "\1F4C5 ";
+}
+
+.ec-event-meta .ec-location::before {
+    content: "\1F4CD ";
+}
+
+/* Form fields */
+.ec-registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ec-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ec-field label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.ec-field input[type="text"],
+.ec-field input[type="email"],
+.ec-field input[type="tel"],
+.ec-field textarea,
+.ec-field select {
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fff;
+}
+
+.ec-field input:focus,
+.ec-field textarea:focus,
+.ec-field select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.ec-field input.ec-invalid,
+.ec-field textarea.ec-invalid,
+.ec-field select.ec-invalid {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.ec-field .ec-field-error {
+    font-size: 12px;
+    color: #ef4444;
+    margin-top: 2px;
+}
+
+.ec-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 400 !important;
+    cursor: pointer;
+}
+
+/* Submit button */
+.ec-submit-btn {
+    display: inline-block;
+    padding: 12px 32px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ec-submit-btn:hover {
+    background: #2563eb;
+}
+
+.ec-submit-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Messages */
+.ec-message {
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.ec-message--error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.ec-message--success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+/* Success panel */
+.ec-success-panel {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.ec-success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: #d1fae5;
+    color: #065f46;
+    border-radius: 50%;
+    font-size: 32px;
+    margin-bottom: 16px;
+}
+
+.ec-success-panel h3 {
+    font-size: 24px;
+    color: #065f46;
+    margin: 0 0 8px;
+}
+
+.ec-qr-preview img {
+    max-width: 200px;
+    margin-top: 16px;
+    border: 4px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.ec-error {
+    padding: 16px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    border-radius: 6px;
+    text-align: center;
+}

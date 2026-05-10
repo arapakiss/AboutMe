@@ -1,0 +1,94 @@
+/**
+ * Event Check-in - Admin Styles
+ */
+
+/* Status badges */
+.ec-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ec-status--draft {
+    background: #f0f0f1;
+    color: #50575e;
+}
+
+.ec-status--published {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.ec-status--closed {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.ec-status--archived {
+    background: #e5e7eb;
+    color: #4b5563;
+}
+
+.ec-status--registered {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.ec-status--checked_in {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.ec-status--cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Custom fields builder */
+#ec-custom-fields {
+    margin: 10px 0;
+}
+
+.ec-custom-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding: 10px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+}
+
+.ec-custom-field input[type="text"] {
+    flex: 1;
+}
+
+.ec-custom-field select {
+    width: 120px;
+}
+
+.ec-custom-field .ec-remove-field {
+    color: #d63638;
+    border-color: #d63638;
+    min-width: 30px;
+    padding: 0 8px;
+}
+
+/* Shortcode display */
+code {
+    display: inline-block;
+    margin: 2px 4px;
+    padding: 2px 6px;
+    background: #f0f0f1;
+    font-size: 12px;
+}
+
+/* Event form */
+#ec-event-form .form-table th {
+    width: 200px;
+}

@@ -1,0 +1,295 @@
+/**
+ * Event Check-in - Kiosk Mode Styles
+ * Designed for fullscreen tablet usage.
+ */
+
+.ec-kiosk {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #0f172a;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    z-index: 999999;
+}
+
+/* Screens */
+.ec-kiosk-screen {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.ec-kiosk-screen.active {
+    display: flex;
+}
+
+/* Scanner screen */
+.ec-kiosk-screen--scanner {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.ec-kiosk-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.ec-kiosk-header h1 {
+    font-size: 36px;
+    margin: 0 0 10px;
+    color: #f8fafc;
+}
+
+.ec-kiosk-prompt {
+    font-size: 20px;
+    color: #94a3b8;
+}
+
+.ec-scanner-viewport {
+    width: 350px;
+    height: 350px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 3px solid #3b82f6;
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+}
+
+.ec-scanner-viewport video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ec-kiosk-stats {
+    margin-top: 30px;
+    font-size: 16px;
+    color: #64748b;
+}
+
+.ec-kiosk-stats span {
+    font-weight: 700;
+    color: #3b82f6;
+    font-size: 20px;
+}
+
+/* Processing screen */
+.ec-kiosk-screen--processing {
+    background: #0f172a;
+}
+
+.ec-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: ec-spin 0.8s linear infinite;
+}
+
+@keyframes ec-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Signature screen */
+.ec-kiosk-screen--signature {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.ec-kiosk-screen--signature h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.ec-welcome-name {
+    font-size: 22px;
+    color: #3b82f6;
+    margin-bottom: 24px;
+}
+
+.ec-signature-wrapper {
+    background: #fff;
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+#ec-signature-pad {
+    display: block;
+    border-radius: 8px;
+    touch-action: none;
+    cursor: crosshair;
+}
+
+.ec-signature-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.ec-btn {
+    padding: 14px 40px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+}
+
+.ec-btn:active {
+    transform: scale(0.97);
+}
+
+.ec-btn--primary {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.ec-btn--primary:hover {
+    background: #2563eb;
+}
+
+.ec-btn--secondary {
+    background: #475569;
+    color: #fff;
+}
+
+.ec-btn--secondary:hover {
+    background: #64748b;
+}
+
+/* Success screen */
+.ec-kiosk-screen--success {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+}
+
+.ec-success-checkmark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    font-size: 52px;
+    margin-bottom: 20px;
+    animation: ec-pop 0.4s ease-out;
+}
+
+@keyframes ec-pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.ec-kiosk-screen--success h2 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+/* Already checked in screen */
+.ec-kiosk-screen--already {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+}
+
+.ec-already-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    font-size: 52px;
+    margin-bottom: 20px;
+}
+
+/* Error screen */
+.ec-kiosk-screen--error {
+    background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+}
+
+.ec-error-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    font-size: 52px;
+    margin-bottom: 20px;
+}
+
+/* Auto-reset countdown */
+.ec-auto-reset {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.ec-auto-reset p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+.ec-countdown-bar {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.ec-countdown-fill {
+    height: 100%;
+    background: #fff;
+    width: 100%;
+    border-radius: 2px;
+    transition: width linear;
+}
+
+/* Responsive adjustments for tablets */
+@media (max-width: 768px) {
+    .ec-kiosk-header h1 {
+        font-size: 28px;
+    }
+
+    .ec-scanner-viewport {
+        width: 280px;
+        height: 280px;
+    }
+
+    .ec-kiosk-screen--signature h2 {
+        font-size: 22px;
+    }
+
+    #ec-signature-pad {
+        width: 400px;
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ec-scanner-viewport {
+        width: 240px;
+        height: 240px;
+    }
+
+    #ec-signature-pad {
+        width: 300px;
+        height: 120px;
+    }
+}

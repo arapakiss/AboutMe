@@ -67,6 +67,15 @@ class Admin {
             'ec-email-template',
             array( __CLASS__, 'render_email_template_page' )
         );
+
+        add_submenu_page(
+            'event-checkin',
+            __( 'Settings', 'event-checkin' ),
+            __( 'Settings', 'event-checkin' ),
+            'ec_manage_settings',
+            'ec-settings',
+            array( __CLASS__, 'render_settings_page' )
+        );
     }
 
     /**
@@ -80,6 +89,7 @@ class Admin {
             'event-check-in_page_ec-add-event',
             'event-check-in_page_ec-registrations',
             'event-check-in_page_ec-email-template',
+            'event-check-in_page_ec-settings',
         );
 
         if ( ! in_array( $hook, $ec_pages, true ) ) {
@@ -620,5 +630,119 @@ class Admin {
 
         wp_safe_redirect( admin_url( 'admin.php?page=ec-email-template&updated=1' ) );
         exit;
+    }
+
+    /**
+     * Render the settings page.
+     */
+    public static function render_settings_page() {
+        $settings = Settings::get_all();
+        $saved    = isset( $_GET['updated'] ) && $_GET['updated'] === '1';
+        $has_object_cache = wp_using_ext_object_cache();
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'Settings', 'event-checkin' ); ?></h1>
+
+            <?php if ( $saved ) : ?>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'event-checkin' ); ?></p></div>
+            <?php endif; ?>
+
+            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                <input type="hidden" name="action" value="ec_save_settings">
+                <?php wp_nonce_field( 'ec_save_settings', 'ec_nonce' ); ?>
+
+                <!-- reCAPTCHA Section -->
+                <h2><?php esc_html_e( 'reCAPTCHA v3 (Bot Protection)', 'event-checkin' ); ?></h2>
+                <p class="description"><?php esc_html_e( 'Optional. Adds invisible reCAPTCHA v3 to registration forms. Get keys at https://www.google.com/recaptcha/admin', 'event-checkin' ); ?></p>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="recaptcha_enabled"><?php esc_html_e( 'Enable reCAPTCHA', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <label>
+                                <input type="checkbox" id="recaptcha_enabled" name="recaptcha_enabled" value="1" <?php checked( $settings['recaptcha_enabled'] ); ?>>
+                                <?php esc_html_e( 'Enable reCAPTCHA v3 on registration forms', 'event-checkin' ); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="recaptcha_site_key"><?php esc_html_e( 'Site Key', 'event-checkin' ); ?></label></th>
+                        <td><input type="text" id="recaptcha_site_key" name="recaptcha_site_key" value="<?php echo esc_attr( $settings['recaptcha_site_key'] ); ?>" class="regular-text"></td>
+                    </tr>
+                    <tr>
+                        <th><label for="recaptcha_secret_key"><?php esc_html_e( 'Secret Key', 'event-checkin' ); ?></label></th>
+                        <td><input type="password" id="recaptcha_secret_key" name="recaptcha_secret_key" value="<?php echo esc_attr( $settings['recaptcha_secret_key'] ); ?>" class="regular-text"></td>
+                    </tr>
+                    <tr>
+                        <th><label for="recaptcha_threshold"><?php esc_html_e( 'Score Threshold', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <input type="number" id="recaptcha_threshold" name="recaptcha_threshold" value="<?php echo esc_attr( $settings['recaptcha_threshold'] ); ?>" min="0" max="1" step="0.1" class="small-text">
+                            <p class="description"><?php esc_html_e( '0.0 = allow all, 1.0 = strictest. Default: 0.5', 'event-checkin' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Performance Section -->
+                <h2><?php esc_html_e( 'Performance', 'event-checkin' ); ?></h2>
+                <table class="form-table">
+                    <tr>
+                        <th><?php esc_html_e( 'Object Cache', 'event-checkin' ); ?></th>
+                        <td>
+                            <?php if ( $has_object_cache ) : ?>
+                                <span style="color: #065f46; font-weight: 700;">&#10003; <?php esc_html_e( 'Active (Redis/Memcached detected)', 'event-checkin' ); ?></span>
+                            <?php else : ?>
+                                <span style="color: #9ca3af;"><?php esc_html_e( 'Not detected. Using transient caching as fallback. For best performance with 1000+ users, install Redis or Memcached.', 'event-checkin' ); ?></span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="object_cache_ttl"><?php esc_html_e( 'Cache TTL (seconds)', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <input type="number" id="object_cache_ttl" name="object_cache_ttl" value="<?php echo esc_attr( $settings['object_cache_ttl'] ); ?>" min="30" max="3600" class="small-text">
+                            <p class="description"><?php esc_html_e( 'How long to cache event data. Lower = more fresh, higher = less DB load. Default: 300', 'event-checkin' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="export_chunk_size"><?php esc_html_e( 'Export Chunk Size', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <input type="number" id="export_chunk_size" name="export_chunk_size" value="<?php echo esc_attr( $settings['export_chunk_size'] ); ?>" min="100" max="5000" class="small-text">
+                            <p class="description"><?php esc_html_e( 'Rows per output buffer flush during Excel export. Default: 500', 'event-checkin' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Kiosk Section -->
+                <h2><?php esc_html_e( 'Kiosk', 'event-checkin' ); ?></h2>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="kiosk_idle_timeout"><?php esc_html_e( 'Idle Timeout (seconds)', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <input type="number" id="kiosk_idle_timeout" name="kiosk_idle_timeout" value="<?php echo esc_attr( $settings['kiosk_idle_timeout'] ); ?>" min="5" max="60" class="small-text">
+                            <p class="description"><?php esc_html_e( 'Seconds before auto-resetting to scanner after check-in. Default: 15', 'event-checkin' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Email Section -->
+                <h2><?php esc_html_e( 'Email Sending', 'event-checkin' ); ?></h2>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="email_from_name"><?php esc_html_e( 'From Name', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <input type="text" id="email_from_name" name="email_from_name" value="<?php echo esc_attr( $settings['email_from_name'] ); ?>" class="regular-text" placeholder="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+                            <p class="description"><?php esc_html_e( 'Leave empty to use site name. For reliable delivery, use an SMTP plugin like WP Mail SMTP.', 'event-checkin' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="email_from_address"><?php esc_html_e( 'From Address', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <input type="email" id="email_from_address" name="email_from_address" value="<?php echo esc_attr( $settings['email_from_address'] ); ?>" class="regular-text" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>">
+                        </td>
+                    </tr>
+                </table>
+
+                <?php submit_button(); ?>
+            </form>
+        </div>
+        <?php
     }
 }

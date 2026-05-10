@@ -35,19 +35,19 @@ class Checkin {
             EC_VERSION
         );
 
-        // html5-qrcode library from CDN.
+        // html5-qrcode library (bundled locally for offline kiosk reliability).
         wp_enqueue_script(
             'html5-qrcode',
-            'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
+            EC_PLUGIN_URL . 'assets/js/vendor/html5-qrcode.min.js',
             array(),
             '2.3.8',
             true
         );
 
-        // Signature pad library from CDN.
+        // Signature pad library (bundled locally).
         wp_enqueue_script(
             'signature-pad',
-            'https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js',
+            EC_PLUGIN_URL . 'assets/js/vendor/signature_pad.umd.min.js',
             array(),
             '4.1.7',
             true

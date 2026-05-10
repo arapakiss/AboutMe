@@ -1,5 +1,6 @@
 /**
  * Event Check-in - Registration Form JavaScript
+ * Handles form validation, reCAPTCHA, and AJAX submission.
  */
 (function ($) {
     'use strict';
@@ -58,39 +59,68 @@
         // Disable button.
         $btn.prop('disabled', true).text(ecRegistration.i18n.submitting);
 
-        $.ajax({
-            url: ecRegistration.ajaxUrl,
-            type: 'POST',
-            data: $form.serialize(),
-            dataType: 'json',
-            success: function (response) {
-                if (response.success) {
-                    $form.hide();
-                    var $success = $wrapper.find('.ec-success-panel');
-                    $success.show();
-
-                    if (response.data && response.data.qr_url) {
-                        $success.find('.ec-qr-preview').html(
-                            '<img src="' + response.data.qr_url + '" alt="QR Code">'
-                        );
-                    }
-                } else {
-                    var message = response.data && response.data.message
-                        ? response.data.message
-                        : ecRegistration.i18n.error;
-                    $msg.addClass('ec-message--error').text(message).show();
-                    $btn.prop('disabled', false).text($btn.data('original-text') || 'Register');
-                }
-            },
-            error: function (xhr) {
-                var message = ecRegistration.i18n.error;
-                if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
-                    message = xhr.responseJSON.data.message;
-                }
-                $msg.addClass('ec-message--error').text(message).show();
-                $btn.prop('disabled', false).text($btn.data('original-text') || 'Register');
+        /**
+         * Submit the form data via AJAX.
+         * @param {string} recaptchaToken Optional reCAPTCHA token.
+         */
+        function submitForm(recaptchaToken) {
+            var formData = $form.serialize();
+            if (recaptchaToken) {
+                formData += '&ec_recaptcha_token=' + encodeURIComponent(recaptchaToken);
             }
-        });
+
+            $.ajax({
+                url: ecRegistration.ajaxUrl,
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        $form.hide();
+                        var $success = $wrapper.find('.ec-success-panel');
+                        $success.show();
+
+                        if (response.data && response.data.qr_url) {
+                            $success.find('.ec-qr-preview').html(
+                                '<img src="' + response.data.qr_url + '" alt="QR Code">'
+                            );
+                        }
+                    } else {
+                        showError(response.data && response.data.message
+                            ? response.data.message
+                            : ecRegistration.i18n.error);
+                    }
+                },
+                error: function (xhr) {
+                    var message = ecRegistration.i18n.error;
+                    if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+                        message = xhr.responseJSON.data.message;
+                    }
+                    showError(message);
+                }
+            });
+        }
+
+        function showError(message) {
+            $msg.addClass('ec-message--error').text(message).show();
+            $btn.prop('disabled', false).text($btn.data('original-text') || 'Register');
+        }
+
+        // If reCAPTCHA is enabled, get token first.
+        if (ecRegistration.recaptchaEnabled && typeof grecaptcha !== 'undefined') {
+            grecaptcha.ready(function () {
+                grecaptcha.execute(ecRegistration.recaptchaSiteKey, { action: 'ec_register' })
+                    .then(function (token) {
+                        submitForm(token);
+                    })
+                    .catch(function () {
+                        // On reCAPTCHA failure, submit without token (server will decide).
+                        submitForm('');
+                    });
+            });
+        } else {
+            submitForm('');
+        }
     });
 
     // Store original button text.

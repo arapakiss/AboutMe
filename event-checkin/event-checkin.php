@@ -65,11 +65,13 @@ require_once EC_PLUGIN_DIR . 'includes/class-qrcode.php';
 require_once EC_PLUGIN_DIR . 'includes/class-checkin.php';
 require_once EC_PLUGIN_DIR . 'includes/class-signature.php';
 require_once EC_PLUGIN_DIR . 'includes/class-export.php';
+require_once EC_PLUGIN_DIR . 'includes/class-settings.php';
 
 add_action( 'plugins_loaded', function () {
     EventCheckin\Security::init();
     EventCheckin\Roles::init();
     EventCheckin\Email::init();
+    EventCheckin\Settings::init();
     EventCheckin\Admin::init();
     EventCheckin\Rest_API::init();
     EventCheckin\Registration::init();

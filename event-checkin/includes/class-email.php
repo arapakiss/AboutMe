@@ -232,5 +232,31 @@ If you have any questions, please contact us.
      */
     public static function init() {
         add_action( self::QUEUE_HOOK, array( __CLASS__, 'process_queue' ) );
+
+        // Override from name/address if configured.
+        add_filter( 'wp_mail_from', array( __CLASS__, 'filter_from_address' ) );
+        add_filter( 'wp_mail_from_name', array( __CLASS__, 'filter_from_name' ) );
+    }
+
+    /**
+     * Filter the from email address.
+     *
+     * @param string $from Default from address.
+     * @return string
+     */
+    public static function filter_from_address( $from ) {
+        $custom = Settings::get( 'email_from_address' );
+        return ! empty( $custom ) ? sanitize_email( $custom ) : $from;
+    }
+
+    /**
+     * Filter the from name.
+     *
+     * @param string $name Default from name.
+     * @return string
+     */
+    public static function filter_from_name( $name ) {
+        $custom = Settings::get( 'email_from_name' );
+        return ! empty( $custom ) ? sanitize_text_field( $custom ) : $name;
     }
 }

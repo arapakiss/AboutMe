@@ -45,10 +45,23 @@ class Registration {
             true
         );
 
+        // Load reCAPTCHA v3 if enabled.
+        if ( Settings::is_recaptcha_enabled() ) {
+            wp_enqueue_script(
+                'google-recaptcha',
+                'https://www.google.com/recaptcha/api.js?render=' . esc_attr( Settings::get( 'recaptcha_site_key' ) ),
+                array(),
+                null,
+                true
+            );
+        }
+
         wp_localize_script( 'ec-registration', 'ecRegistration', array(
-            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-            'nonce'   => wp_create_nonce( 'ec_registration_nonce' ),
-            'i18n'    => array(
+            'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
+            'nonce'            => wp_create_nonce( 'ec_registration_nonce' ),
+            'recaptchaEnabled' => Settings::is_recaptcha_enabled(),
+            'recaptchaSiteKey' => Settings::is_recaptcha_enabled() ? Settings::get( 'recaptcha_site_key' ) : '',
+            'i18n'             => array(
                 'submitting'    => __( 'Submitting...', 'event-checkin' ),
                 'success'       => __( 'Registration successful! Check your email for the QR code.', 'event-checkin' ),
                 'error'         => __( 'An error occurred. Please try again.', 'event-checkin' ),
@@ -231,6 +244,14 @@ class Registration {
         // Rate limiting.
         if ( ! Security::check_rate_limit( Security::RATE_LIMIT_REGISTRATION ) ) {
             wp_send_json_error( array( 'message' => __( 'Too many registration attempts. Please try again later.', 'event-checkin' ) ), 429 );
+        }
+
+        // reCAPTCHA verification.
+        if ( Settings::is_recaptcha_enabled() ) {
+            $recaptcha_token = sanitize_text_field( $_POST['ec_recaptcha_token'] ?? '' );
+            if ( ! Settings::verify_recaptcha( $recaptcha_token, 'ec_register' ) ) {
+                wp_send_json_error( array( 'message' => __( 'Bot detection failed. Please try again.', 'event-checkin' ) ), 403 );
+            }
         }
 
         $event_id   = absint( $_POST['event_id'] ?? 0 );

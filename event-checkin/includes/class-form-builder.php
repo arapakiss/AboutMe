@@ -166,7 +166,7 @@ class Form_Builder {
             </div>
 
             <!-- Page Creation Options -->
-            <div class="ec-builder-page-options" id="ec-page-options" style="display:none;">
+            <div class="ec-builder-page-options" id="ec-page-options">
                 <label class="ec-setting-checkbox">
                     <input type="checkbox" id="ec-opt-hide-header" checked>
                     <?php esc_html_e( 'Hide theme header', 'event-checkin' ); ?>

@@ -114,7 +114,6 @@
                     self.selectedFieldId = null;
                     self.renderAll();
                     $('#ec-canvas-empty').hide();
-                    $('#ec-page-options').show();
                 }
             });
         },

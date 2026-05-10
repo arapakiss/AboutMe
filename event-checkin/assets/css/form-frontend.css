@@ -27,8 +27,8 @@
     height: 100vh;
     max-height: 100vh;
     display: grid;
-    grid-template-columns: minmax(280px, 32vw) minmax(0, 1fr);
-    background: linear-gradient(90deg, #fff 0%, #fff 32%, #eef3f8 32%, #f8fafc 100%);
+    grid-template-columns: minmax(240px, 24vw) minmax(0, 1fr);
+    background: linear-gradient(90deg, #fff 0%, #fff 24%, #eef3f8 24%, #f8fafc 100%);
     overflow: hidden;
 }
 

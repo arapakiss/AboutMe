@@ -90,11 +90,15 @@ class Form_Renderer {
         $steps    = $schema['steps'];
         $settings = $schema['settings'] ?? array();
 
+        // Strip sensitive data before outputting schema to the frontend.
+        $frontend_schema = $schema;
+        unset( $frontend_schema['settings']['deepl_api_key'] );
+
         ob_start();
         ?>
         <div class="ec-form-app" id="ec-form-app"
              data-event-id="<?php echo intval( $event_id ); ?>"
-             data-schema="<?php echo esc_attr( wp_json_encode( $schema ) ); ?>">
+             data-schema="<?php echo esc_attr( wp_json_encode( $frontend_schema ) ); ?>">
 
             <!-- Left Panel -->
             <aside class="ec-form-left">

@@ -66,6 +66,10 @@ require_once EC_PLUGIN_DIR . 'includes/class-checkin.php';
 require_once EC_PLUGIN_DIR . 'includes/class-signature.php';
 require_once EC_PLUGIN_DIR . 'includes/class-export.php';
 require_once EC_PLUGIN_DIR . 'includes/class-settings.php';
+require_once EC_PLUGIN_DIR . 'includes/class-form-fields.php';
+require_once EC_PLUGIN_DIR . 'includes/class-form-builder.php';
+require_once EC_PLUGIN_DIR . 'includes/class-form-renderer.php';
+require_once EC_PLUGIN_DIR . 'includes/class-verification.php';
 
 add_action( 'plugins_loaded', function () {
     EventCheckin\Security::init();
@@ -76,4 +80,7 @@ add_action( 'plugins_loaded', function () {
     EventCheckin\Rest_API::init();
     EventCheckin\Registration::init();
     EventCheckin\Checkin::init();
+    EventCheckin\Form_Builder::init();
+    EventCheckin\Form_Renderer::init();
+    EventCheckin\Verification::init();
 });

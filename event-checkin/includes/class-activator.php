@@ -50,6 +50,7 @@ class Activator {
             registration_deadline DATETIME DEFAULT NULL,
             require_signature TINYINT(1) NOT NULL DEFAULT 0,
             custom_fields LONGTEXT DEFAULT NULL,
+            form_schema LONGTEXT DEFAULT NULL,
             status VARCHAR(20) NOT NULL DEFAULT 'draft',
             created_by BIGINT UNSIGNED NOT NULL DEFAULT 0,
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -106,6 +107,9 @@ class Activator {
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $sql );
+
+        // Verifications table for email/SMS OTP.
+        Verification::create_table();
     }
 
     /**

@@ -272,13 +272,13 @@
     color: var(--ec-navy);
 }
 
-/* Scanner screen */
+/* Scanner screen -- larger viewport for better QR recognition */
 .ec-scanner-viewport {
-    width: 320px;
-    height: 320px;
+    width: min(420px, 70vw);
+    height: min(420px, 70vw);
     overflow: hidden;
     border: 3px solid var(--ec-navy);
-    margin: 24px 0;
+    margin: 24px auto;
 }
 
 .ec-scanner-viewport video {

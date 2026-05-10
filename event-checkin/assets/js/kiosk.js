@@ -75,12 +75,19 @@
         startScanning: function () {
             var self = this;
 
+            // Use a larger scan area and higher fps for better QR recognition.
+            // formatsToSupport restricts to QR codes only (skips barcode detection).
+            var qrboxSize = Math.min(350, Math.floor(window.innerWidth * 0.6));
             this.scanner.start(
                 { facingMode: 'environment' },
                 {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1.0
+                    fps: 15,
+                    qrbox: { width: qrboxSize, height: qrboxSize },
+                    aspectRatio: 1.0,
+                    formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ],
+                    experimentalFeatures: {
+                        useBarCodeDetectorIfSupported: true
+                    }
                 },
                 function (decodedText) {
                     self.onScanSuccess(decodedText);

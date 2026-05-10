@@ -34,9 +34,11 @@ class QRCode {
         ), home_url( '/' ) );
 
         // Generate QR code using bundled library.
+        // Use high error correction (H) and larger module size (10) for
+        // better scanning reliability from phone/tablet cameras.
         require_once EC_PLUGIN_DIR . 'lib/phpqrcode.php';
 
-        \QRcode::png( $checkin_url, $filepath, QR_ECLEVEL_M, 6, 2 );
+        \QRcode::png( $checkin_url, $filepath, QR_ECLEVEL_H, 10, 4 );
 
         if ( file_exists( $filepath ) ) {
             return $upload_dir['baseurl'] . '/event-checkin/qrcodes/' . $filename;

@@ -16,6 +16,7 @@ class Form_Builder {
         add_action( 'wp_ajax_ec_save_form_schema', array( __CLASS__, 'handle_save_schema' ) );
         add_action( 'wp_ajax_ec_load_form_schema', array( __CLASS__, 'handle_load_schema' ) );
         add_action( 'wp_ajax_ec_create_form_page', array( __CLASS__, 'handle_create_form_page' ) );
+        add_action( 'wp_ajax_ec_create_kiosk_page', array( __CLASS__, 'handle_create_kiosk_page' ) );
     }
 
     /**
@@ -116,6 +117,9 @@ class Form_Builder {
 
         $form_page_id  = get_option( 'ec_default_form_page_id', 0 );
         $form_page_url = $form_page_id ? get_permalink( $form_page_id ) : '';
+
+        $kiosk_page_id  = $event_id ? get_option( 'ec_kiosk_page_' . $event_id, 0 ) : 0;
+        $kiosk_page_url = $kiosk_page_id ? get_permalink( $kiosk_page_id ) : '';
         ?>
         <div class="wrap ec-builder-wrap">
             <!-- Top Bar -->
@@ -145,6 +149,14 @@ class Form_Builder {
                     <?php if ( $form_page_url ) : ?>
                         <a href="<?php echo esc_url( $form_page_url ); ?>" target="_blank" class="ec-builder-btn ec-builder-btn--ghost">
                             <?php esc_html_e( 'View Page', 'event-checkin' ); ?>
+                        </a>
+                    <?php endif; ?>
+                    <button type="button" class="ec-builder-btn ec-builder-btn--ghost" id="ec-create-kiosk">
+                        <?php esc_html_e( 'Create Kiosk Page', 'event-checkin' ); ?>
+                    </button>
+                    <?php if ( $kiosk_page_url ) : ?>
+                        <a href="<?php echo esc_url( $kiosk_page_url ); ?>" target="_blank" class="ec-builder-btn ec-builder-btn--ghost">
+                            <?php esc_html_e( 'View Kiosk', 'event-checkin' ); ?>
                         </a>
                     <?php endif; ?>
                     <button type="button" class="ec-builder-btn ec-builder-btn--primary" id="ec-save-form">
@@ -373,6 +385,56 @@ class Form_Builder {
             'page_id'  => $page_id,
             'page_url' => get_permalink( $page_id ),
             'message'  => __( 'Registration page created!', 'event-checkin' ),
+        ) );
+    }
+
+    /**
+     * AJAX: Create a kiosk check-in page for an event.
+     */
+    public static function handle_create_kiosk_page() {
+        check_ajax_referer( 'ec_form_builder', 'nonce' );
+
+        if ( ! current_user_can( 'ec_manage_events' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized', 'event-checkin' ) ), 403 );
+        }
+
+        $event_id = absint( $_POST['event_id'] ?? 0 );
+        if ( ! $event_id ) {
+            wp_send_json_error( array( 'message' => __( 'No event selected.', 'event-checkin' ) ), 400 );
+        }
+
+        // Check if kiosk page already exists for this event.
+        $existing = get_option( 'ec_kiosk_page_' . $event_id, 0 );
+        if ( $existing && get_post_status( $existing ) !== false ) {
+            wp_send_json_success( array(
+                'page_id'  => $existing,
+                'page_url' => get_permalink( $existing ),
+                'message'  => __( 'Kiosk page already exists.', 'event-checkin' ),
+            ) );
+        }
+
+        global $wpdb;
+        $event = $wpdb->get_row(
+            $wpdb->prepare( "SELECT title FROM {$wpdb->prefix}ec_events WHERE id = %d", $event_id )
+        );
+
+        $page_id = wp_insert_post( array(
+            'post_title'   => sprintf( __( 'Kiosk: %s', 'event-checkin' ), $event ? $event->title : 'Event' ),
+            'post_content' => '[event_kiosk id="' . $event_id . '"]',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        ) );
+
+        if ( is_wp_error( $page_id ) ) {
+            wp_send_json_error( array( 'message' => $page_id->get_error_message() ), 500 );
+        }
+
+        update_option( 'ec_kiosk_page_' . $event_id, $page_id );
+
+        wp_send_json_success( array(
+            'page_id'  => $page_id,
+            'page_url' => get_permalink( $page_id ),
+            'message'  => __( 'Kiosk page created!', 'event-checkin' ),
         ) );
     }
 

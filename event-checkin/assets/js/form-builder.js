@@ -85,6 +85,11 @@
                 self.createFormPage();
             });
 
+            $('#ec-create-kiosk').on('click', function() {
+                if (!self.eventId) { alert('Select an event first.'); return; }
+                self.createKioskPage();
+            });
+
             // Import / Export.
             $('#ec-export-form').on('click', function() { self.exportSchema(); });
             $('#ec-import-form').on('click', function() { $('#ec-import-file').click(); });
@@ -147,6 +152,24 @@
                     if (res.data.page_url) {
                         window.open(res.data.page_url, '_blank');
                     }
+                }
+            });
+        },
+
+        createKioskPage: function() {
+            var self = this;
+            $.post(ecFormBuilder.ajaxUrl, {
+                action: 'ec_create_kiosk_page',
+                nonce: ecFormBuilder.nonce,
+                event_id: this.eventId
+            }, function(res) {
+                if (res.success) {
+                    self.showToast(res.data.message || 'Kiosk page created!');
+                    if (res.data.page_url) {
+                        window.open(res.data.page_url, '_blank');
+                    }
+                } else {
+                    self.showToast(res.data.message || 'Error creating kiosk page', true);
                 }
             });
         },

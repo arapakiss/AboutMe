@@ -670,6 +670,27 @@
     to { transform: translateY(0); opacity: 1; }
 }
 
+/* Page Creation Options Bar */
+.ec-builder-page-options {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 6px 20px;
+    background: var(--ecb-soft);
+    border-bottom: 1px solid var(--ecb-line);
+    font-size: 12px;
+}
+
+.ec-builder-page-options .ec-setting-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ecb-navy);
+    cursor: pointer;
+}
+
 /* Palette category items container (for proper Sortable nesting) */
 .ec-palette-category-items {
     display: flex;

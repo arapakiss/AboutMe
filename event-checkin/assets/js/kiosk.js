@@ -25,6 +25,23 @@
             this.eventId = parseInt(el.dataset.eventId, 10);
             this.requireSignature = el.dataset.requireSignature === '1';
 
+            // Hide header/footer if configured.
+            var hideHeader = el.dataset.hideHeader === '1';
+            var hideFooter = el.dataset.hideFooter === '1';
+            if (hideHeader || hideFooter) {
+                var headerSels = 'header, .site-header, #masthead, .header, #header, .wp-site-header, [role="banner"]';
+                var footerSels = 'footer, .site-footer, #colophon, .footer, #footer, .wp-site-footer, [role="contentinfo"]';
+                if (hideHeader) {
+                    document.querySelectorAll(headerSels).forEach(function(h) { h.classList.add('ec-hidden'); });
+                }
+                if (hideFooter) {
+                    document.querySelectorAll(footerSels).forEach(function(f) { f.classList.add('ec-hidden'); });
+                }
+                var adminBar = document.getElementById('wpadminbar');
+                if (adminBar) { adminBar.classList.add('ec-hidden'); }
+                document.documentElement.style.marginTop = '0';
+            }
+
             this.initScanner();
             this.initSignaturePad();
             this.updateStats();

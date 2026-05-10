@@ -23,6 +23,10 @@
             if (!this.schema) return;
 
             this.totalSteps = $('.ec-form-panel').length;
+
+            // Hide header/footer if configured.
+            this.applyLayoutMode($app);
+
             this.bindNavigation();
             this.bindVerification();
             this.bindWebsitePreviews();
@@ -31,6 +35,32 @@
             this.bindSubmit();
             this.bindLanguageSwitcher();
             this.bindCompanyCard();
+        },
+
+        // ── Layout Mode: hide header/footer, fill viewport ──
+        applyLayoutMode: function($app) {
+            var hideHeader = $app.data('hide-header') === 1 || $app.data('hide-header') === '1';
+            var hideFooter = $app.data('hide-footer') === 1 || $app.data('hide-footer') === '1';
+
+            if (hideHeader || hideFooter) {
+                // Common WP theme header/footer selectors.
+                var headerSelectors = 'header, .site-header, #masthead, .header, #header, .wp-site-header, [role="banner"]';
+                var footerSelectors = 'footer, .site-footer, #colophon, .footer, #footer, .wp-site-footer, [role="contentinfo"]';
+
+                if (hideHeader) {
+                    $(headerSelectors).addClass('ec-hidden');
+                }
+                if (hideFooter) {
+                    $(footerSelectors).addClass('ec-hidden');
+                }
+
+                // Add fullscreen class to the app.
+                $app.addClass('ec-form-fullscreen');
+
+                // Also hide WP admin bar if present.
+                $('#wpadminbar').addClass('ec-hidden');
+                $('html').css('margin-top', '0');
+            }
         },
 
         // ── Navigation ──

@@ -59,8 +59,14 @@ class Form_Renderer {
      * @return string HTML.
      */
     public static function render_shortcode( $atts ) {
-        $atts     = shortcode_atts( array( 'id' => 0 ), $atts, 'event_registration' );
-        $event_id = absint( $atts['id'] );
+        $atts     = shortcode_atts( array(
+            'id'          => 0,
+            'hide_header' => 0,
+            'hide_footer' => 0,
+        ), $atts, 'event_registration' );
+        $event_id    = absint( $atts['id'] );
+        $hide_header = (bool) $atts['hide_header'];
+        $hide_footer = (bool) $atts['hide_footer'];
 
         if ( ! $event_id ) {
             return '<p class="ec-error">' . esc_html__( 'Invalid event ID.', 'event-checkin' ) . '</p>';
@@ -98,7 +104,9 @@ class Form_Renderer {
         ?>
         <div class="ec-form-app" id="ec-form-app"
              data-event-id="<?php echo intval( $event_id ); ?>"
-             data-schema="<?php echo esc_attr( wp_json_encode( $frontend_schema ) ); ?>">
+             data-schema="<?php echo esc_attr( wp_json_encode( $frontend_schema ) ); ?>"
+             data-hide-header="<?php echo $hide_header ? '1' : '0'; ?>"
+             data-hide-footer="<?php echo $hide_footer ? '1' : '0'; ?>">
 
             <!-- Left Panel -->
             <aside class="ec-form-left">

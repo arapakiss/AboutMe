@@ -114,6 +114,7 @@
                     self.selectedFieldId = null;
                     self.renderAll();
                     $('#ec-canvas-empty').hide();
+                    $('#ec-page-options').show();
                 }
             });
         },
@@ -140,12 +141,22 @@
             });
         },
 
+        getPageOptions: function() {
+            return {
+                hide_header: $('#ec-opt-hide-header').is(':checked') ? 1 : 0,
+                hide_footer: $('#ec-opt-hide-footer').is(':checked') ? 1 : 0
+            };
+        },
+
         createFormPage: function() {
             var self = this;
+            var opts = this.getPageOptions();
             $.post(ecFormBuilder.ajaxUrl, {
                 action: 'ec_create_form_page',
                 nonce: ecFormBuilder.nonce,
-                event_id: this.eventId
+                event_id: this.eventId,
+                hide_header: opts.hide_header,
+                hide_footer: opts.hide_footer
             }, function(res) {
                 if (res.success) {
                     self.showToast(ecFormBuilder.i18n.pageCreated);
@@ -158,10 +169,13 @@
 
         createKioskPage: function() {
             var self = this;
+            var opts = this.getPageOptions();
             $.post(ecFormBuilder.ajaxUrl, {
                 action: 'ec_create_kiosk_page',
                 nonce: ecFormBuilder.nonce,
-                event_id: this.eventId
+                event_id: this.eventId,
+                hide_header: opts.hide_header,
+                hide_footer: opts.hide_footer
             }, function(res) {
                 if (res.success) {
                     self.showToast(res.data.message || 'Kiosk page created!');

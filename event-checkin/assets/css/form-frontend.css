@@ -17,26 +17,44 @@
     --ecf-shadow: 0 18px 54px rgba(0, 45, 114, 0.10);
 }
 
+/* Hidden utility */
+.ec-hidden { display: none !important; }
+
 .ec-form-app {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     color: var(--ecf-navy);
     width: 100%;
-    min-height: 100vh;
+    height: 100vh;
+    max-height: 100vh;
     display: grid;
     grid-template-columns: minmax(280px, 32vw) minmax(0, 1fr);
     background: linear-gradient(90deg, #fff 0%, #fff 32%, #eef3f8 32%, #f8fafc 100%);
+    overflow: hidden;
+}
+
+/* Fullscreen mode (header/footer hidden) */
+.ec-form-app.ec-form-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99999;
+    height: 100vh;
 }
 
 /* Left panel */
 .ec-form-left {
     position: relative;
-    overflow: hidden auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: clamp(22px, 3vw, 46px);
     border-right: 2px solid var(--ecf-navy);
     background: #fff;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    max-height: 100vh;
 }
 
 .ec-form-left::before {
@@ -176,7 +194,9 @@
     padding: clamp(18px, 2.6vw, 38px) clamp(18px, 3vw, 42px);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 100vh;
 }
 
 .ec-form-topbar {

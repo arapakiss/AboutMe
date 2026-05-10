@@ -483,6 +483,16 @@
                     $body.append(self.settingSocialPlatforms(field));
                     break;
 
+                case 'country':
+                    $body.append(self.settingCheckbox('searchable', 'Searchable', field.searchable, field));
+                    break;
+
+                case 'company_info':
+                    $body.append(self.settingCheckbox('show_logo', 'Show Logo', field.show_logo, field));
+                    $body.append(self.settingCheckbox('show_desc', 'Show Description', field.show_desc, field));
+                    $body.append(self.settingCheckbox('show_social', 'Show Social Links', field.show_social, field));
+                    break;
+
                 case 'hidden':
                     $body.append(self.settingInput('name', 'Field Name', field.name || '', field));
                     $body.append(self.settingInput('value', 'Value', field.value || '', field));

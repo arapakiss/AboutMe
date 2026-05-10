@@ -132,8 +132,8 @@ class DeepL_Translate {
             file_put_contents( $file_path, wp_json_encode( $trans_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
         }
 
-        // Also store in event meta for quick access.
-        update_post_meta( $event_id, '_ec_form_translations', $translations );
+        // Also store in options for quick access (events are in a custom table, not posts).
+        update_option( 'ec_form_translations_' . $event_id, $translations, false );
 
         $response = array(
             'message'      => sprintf( 'Translated into %d language(s).', count( $translations ) ),
@@ -223,19 +223,22 @@ class DeepL_Translate {
         $results = array();
 
         foreach ( $chunks as $chunk ) {
-            $body = array(
-                'auth_key'    => $api_key,
-                'target_lang' => $deepl_lang,
+            // DeepL expects multiple 'text' params with the same key.
+            // WordPress wp_remote_post serializes arrays as text[0], text[1], etc.
+            // We need to build the body string manually for repeated keys.
+            $body_parts = array(
+                'auth_key=' . urlencode( $api_key ),
+                'target_lang=' . urlencode( $deepl_lang ),
             );
-
-            // Add each text parameter.
             foreach ( $chunk as $text ) {
-                $body['text'][] = $text;
+                $body_parts[] = 'text=' . urlencode( $text );
             }
+            $body_string = implode( '&', $body_parts );
 
             $response = wp_remote_post( self::API_URL, array(
                 'timeout' => 30,
-                'body'    => $body,
+                'headers' => array( 'Content-Type' => 'application/x-www-form-urlencoded' ),
+                'body'    => $body_string,
             ) );
 
             if ( is_wp_error( $response ) ) {

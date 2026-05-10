@@ -357,6 +357,24 @@
             var $switcher = $('#ec-form-language');
             if (!$switcher.length) return;
 
+            // Store original English labels for restoring later.
+            var originals = {};
+            $('.ec-ff-label').each(function() {
+                var text = $(this).text().replace(' *', '').trim();
+                originals[text] = text;
+            });
+            $('.ec-form-step-title').each(function() {
+                var text = $(this).text().trim();
+                originals[text] = text;
+            });
+            $('input[placeholder], textarea[placeholder]').each(function() {
+                var ph = $(this).attr('placeholder');
+                if (ph) originals[ph] = ph;
+            });
+            originals['Continue'] = 'Continue';
+            originals['Back'] = 'Back';
+            self.translations['en'] = originals;
+
             $switcher.on('change', function() {
                 var lang = $(this).val();
                 self.currentLang = lang;
@@ -367,8 +385,10 @@
         loadTranslation: function(lang) {
             var self = this;
             if (lang === 'en') {
-                // Reset to original labels.
-                location.reload();
+                // Reset to original English labels from stored originals.
+                if (self.translations['en']) {
+                    self.applyTranslation(self.translations['en']);
+                }
                 return;
             }
 
@@ -444,48 +464,50 @@
         bindCompanyCard: function() {
             if (!$('.ec-ff-company-card').length) return;
 
+            // Use exact field ID selectors for reliability.
+            var fid = function(name) { return '[data-field-id="field_' + name + '"]'; };
+
             // Live-update the company card as users fill in company fields.
-            $(document).on('input change', '[data-field-id*="company_name"] input, [name*="company_name"]', function() {
-                var val = $(this).val();
-                $('#ec-company-card-name').text(val || 'Company Name');
+            $(document).on('input change', fid('company_name') + ' input', function() {
+                $('#ec-company-card-name').text($(this).val() || 'Company Name');
             });
 
-            $(document).on('change', '[data-field-id*="company_type"] select, [name*="company_type"]', function() {
+            $(document).on('change', fid('company_type') + ' select', function() {
                 var text = $(this).find('option:selected').text();
                 if (text && text !== '-- Select --') {
                     $('#ec-company-card-type').text(text);
                 }
             });
 
-            $(document).on('input', '[data-field-id*="company_website"] input', function() {
+            $(document).on('input', fid('company_website') + ' input', function() {
                 var val = $(this).val();
                 var clean = val ? val.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
                 $('#ec-company-card-website').text(clean || '\u2014');
             });
 
-            $(document).on('input change', '[data-field-id*="company_city"] input, [data-field-id*="company_country"] select', function() {
-                var city = $('[data-field-id*="company_city"] input').val() || '';
-                var country = $('[data-field-id*="company_country"] select option:selected').text() || '';
+            $(document).on('input change', fid('company_city') + ' input, ' + fid('company_country') + ' select', function() {
+                var city = $(fid('company_city') + ' input').val() || '';
+                var country = $(fid('company_country') + ' select option:selected').text() || '';
                 if (country === '-- Select Country --') country = '';
                 var loc = [city, country].filter(Boolean).join(', ');
                 $('#ec-company-card-location').text(loc || '\u2014');
             });
 
-            $(document).on('input', '[data-field-id*="company_email"] input', function() {
+            $(document).on('input', fid('company_email') + ' input', function() {
                 $('#ec-company-card-email').text($(this).val() || '\u2014');
             });
 
-            $(document).on('input', '[data-field-id*="company_phone"] input', function() {
+            $(document).on('input', fid('company_phone') + ' input[type="tel"]', function() {
                 var code = $(this).closest('.ec-ff').find('select').val() || '';
                 $('#ec-company-card-phone').text((code + ' ' + $(this).val()).trim() || '\u2014');
             });
 
-            $(document).on('input', '[data-field-id*="company_description"] textarea', function() {
+            $(document).on('input', fid('company_description') + ' textarea', function() {
                 $('#ec-company-card-desc').text($(this).val());
             });
 
             // Logo preview.
-            $(document).on('change', '[data-field-id*="company_logo"] input[type="file"]', function() {
+            $(document).on('change', fid('company_logo') + ' input[type="file"]', function() {
                 var file = this.files && this.files[0];
                 if (!file) return;
                 var reader = new FileReader();

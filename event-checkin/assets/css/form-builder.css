@@ -676,10 +676,18 @@
     flex-direction: column;
 }
 
+/* Make right settings panel scrollable */
+.ec-builder-settings {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
 /* Translation settings section */
 .ec-translation-settings {
     border-top: 2px solid var(--ecb-line);
     margin-top: auto;
+    flex-shrink: 0;
 }
 
 .ec-translation-settings .ec-settings-header {

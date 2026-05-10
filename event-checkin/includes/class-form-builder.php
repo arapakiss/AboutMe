@@ -175,6 +175,10 @@ class Form_Builder {
                     <input type="checkbox" id="ec-opt-hide-footer" checked>
                     <?php esc_html_e( 'Hide theme footer', 'event-checkin' ); ?>
                 </label>
+                <label class="ec-setting-checkbox">
+                    <input type="checkbox" id="ec-opt-hide-title" checked>
+                    <?php esc_html_e( 'Hide page title', 'event-checkin' ); ?>
+                </label>
             </div>
 
             <div class="ec-builder-layout" id="ec-builder-layout">
@@ -381,10 +385,11 @@ class Form_Builder {
 
         $hide_header = ! empty( $_POST['hide_header'] ) ? '1' : '0';
         $hide_footer = ! empty( $_POST['hide_footer'] ) ? '1' : '0';
+        $hide_title  = ! empty( $_POST['hide_title'] ) ? '1' : '0';
 
         $page_id = wp_insert_post( array(
             'post_title'   => sprintf( __( 'Register: %s', 'event-checkin' ), $event ? $event->title : 'Event' ),
-            'post_content' => '[event_registration id="' . $event_id . '" hide_header="' . $hide_header . '" hide_footer="' . $hide_footer . '"]',
+            'post_content' => '[event_registration id="' . $event_id . '" hide_header="' . $hide_header . '" hide_footer="' . $hide_footer . '" hide_title="' . $hide_title . '"]',
             'post_status'  => 'publish',
             'post_type'    => 'page',
         ) );
@@ -433,13 +438,14 @@ class Form_Builder {
             $wpdb->prepare( "SELECT title FROM {$wpdb->prefix}ec_events WHERE id = %d", $event_id )
         );
 
-        // Kiosk defaults to hiding header/footer. Only show if explicitly set to 0.
+        // Kiosk defaults to hiding header/footer/title. Only show if explicitly set to 0.
         $hide_header = isset( $_POST['hide_header'] ) && $_POST['hide_header'] === '0' ? '0' : '1';
         $hide_footer = isset( $_POST['hide_footer'] ) && $_POST['hide_footer'] === '0' ? '0' : '1';
+        $hide_title  = isset( $_POST['hide_title'] ) && $_POST['hide_title'] === '0' ? '0' : '1';
 
         $page_id = wp_insert_post( array(
             'post_title'   => sprintf( __( 'Kiosk: %s', 'event-checkin' ), $event ? $event->title : 'Event' ),
-            'post_content' => '[event_kiosk id="' . $event_id . '" hide_header="' . $hide_header . '" hide_footer="' . $hide_footer . '"]',
+            'post_content' => '[event_kiosk id="' . $event_id . '" hide_header="' . $hide_header . '" hide_footer="' . $hide_footer . '" hide_title="' . $hide_title . '"]',
             'post_status'  => 'publish',
             'post_type'    => 'page',
         ) );

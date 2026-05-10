@@ -146,7 +146,8 @@
         getPageOptions: function() {
             return {
                 hide_header: $('#ec-opt-hide-header').is(':checked') ? 1 : 0,
-                hide_footer: $('#ec-opt-hide-footer').is(':checked') ? 1 : 0
+                hide_footer: $('#ec-opt-hide-footer').is(':checked') ? 1 : 0,
+                hide_title:  $('#ec-opt-hide-title').is(':checked') ? 1 : 0
             };
         },
 
@@ -158,7 +159,8 @@
                 nonce: ecFormBuilder.nonce,
                 event_id: this.eventId,
                 hide_header: opts.hide_header,
-                hide_footer: opts.hide_footer
+                hide_footer: opts.hide_footer,
+                hide_title: opts.hide_title
             }, function(res) {
                 if (res.success) {
                     self.showToast(ecFormBuilder.i18n.pageCreated);
@@ -177,7 +179,8 @@
                 nonce: ecFormBuilder.nonce,
                 event_id: this.eventId,
                 hide_header: opts.hide_header,
-                hide_footer: opts.hide_footer
+                hide_footer: opts.hide_footer,
+                hide_title: opts.hide_title
             }, function(res) {
                 if (res.success) {
                     self.showToast(res.data.message || 'Kiosk page created!');

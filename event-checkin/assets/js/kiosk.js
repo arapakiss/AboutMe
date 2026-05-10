@@ -25,18 +25,25 @@
             this.eventId = parseInt(el.dataset.eventId, 10);
             this.requireSignature = el.dataset.requireSignature === '1';
 
-            // Hide header/footer if configured.
+            // Hide header/footer/title if configured (supports Elementor and popular themes).
             var hideHeader = el.dataset.hideHeader === '1';
             var hideFooter = el.dataset.hideFooter === '1';
+            var hideTitle  = el.dataset.hideTitle === '1';
+
+            var headerSels = 'header, .site-header, #masthead, .header, #header, .wp-site-header, [role="banner"], .elementor-location-header, [data-elementor-type="header"], .ehf-header, #ehf-header, .ast-above-header, .ast-main-header-wrap';
+            var footerSels = 'footer, .site-footer, #colophon, .footer, #footer, .wp-site-footer, [role="contentinfo"], .elementor-location-footer, [data-elementor-type="footer"], .ehf-footer, #ehf-footer, .ast-footer-overlay';
+            var titleSels = '.entry-title, .page-title, .post-title, .entry-header, .page-header, .elementor-page-title, .elementor-widget-theme-page-title, .ast-the-title, .wp-block-post-title, #page-title-wrapper';
+
+            if (hideHeader) {
+                document.querySelectorAll(headerSels).forEach(function(h) { h.classList.add('ec-hidden'); });
+            }
+            if (hideFooter) {
+                document.querySelectorAll(footerSels).forEach(function(f) { f.classList.add('ec-hidden'); });
+            }
+            if (hideTitle) {
+                document.querySelectorAll(titleSels).forEach(function(t) { t.classList.add('ec-hidden'); });
+            }
             if (hideHeader || hideFooter) {
-                var headerSels = 'header, .site-header, #masthead, .header, #header, .wp-site-header, [role="banner"]';
-                var footerSels = 'footer, .site-footer, #colophon, .footer, #footer, .wp-site-footer, [role="contentinfo"]';
-                if (hideHeader) {
-                    document.querySelectorAll(headerSels).forEach(function(h) { h.classList.add('ec-hidden'); });
-                }
-                if (hideFooter) {
-                    document.querySelectorAll(footerSels).forEach(function(f) { f.classList.add('ec-hidden'); });
-                }
                 var adminBar = document.getElementById('wpadminbar');
                 if (adminBar) { adminBar.classList.add('ec-hidden'); }
                 document.documentElement.style.marginTop = '0';

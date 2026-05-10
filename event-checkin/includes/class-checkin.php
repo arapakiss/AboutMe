@@ -94,10 +94,12 @@ class Checkin {
             'id'          => 0,
             'hide_header' => 1,
             'hide_footer' => 1,
+            'hide_title'  => 1,
         ), $atts, 'event_kiosk' );
         $event_id    = absint( $atts['id'] );
         $hide_header = (bool) $atts['hide_header'];
         $hide_footer = (bool) $atts['hide_footer'];
+        $hide_title  = (bool) $atts['hide_title'];
 
         if ( ! $event_id ) {
             return '<p class="ec-error">' . esc_html__( 'Invalid event ID.', 'event-checkin' ) . '</p>';
@@ -122,7 +124,7 @@ class Checkin {
 
         ob_start();
         ?>
-        <div class="ec-kiosk" id="ec-kiosk" data-event-id="<?php echo intval( $event_id ); ?>" data-require-signature="<?php echo intval( $event->require_signature ); ?>" data-hide-header="<?php echo $hide_header ? '1' : '0'; ?>" data-hide-footer="<?php echo $hide_footer ? '1' : '0'; ?>">
+        <div class="ec-kiosk" id="ec-kiosk" data-event-id="<?php echo intval( $event_id ); ?>" data-require-signature="<?php echo intval( $event->require_signature ); ?>" data-hide-header="<?php echo $hide_header ? '1' : '0'; ?>" data-hide-footer="<?php echo $hide_footer ? '1' : '0'; ?>" data-hide-title="<?php echo $hide_title ? '1' : '0'; ?>">
             <!-- Left Hero Panel (desktop) -->
             <div class="ec-kiosk-hero">
                 <div class="ec-kiosk-hero-ghost">

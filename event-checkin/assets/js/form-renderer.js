@@ -37,30 +37,88 @@
             this.bindCompanyCard();
         },
 
-        // ── Layout Mode: hide header/footer, fill viewport ──
+        // ── Layout Mode: hide header/footer/title, fill viewport ──
         applyLayoutMode: function($app) {
             var hideHeader = $app.data('hide-header') === 1 || $app.data('hide-header') === '1';
             var hideFooter = $app.data('hide-footer') === 1 || $app.data('hide-footer') === '1';
+            var hideTitle  = $app.data('hide-title') === 1 || $app.data('hide-title') === '1';
+
+            // Common WP + Elementor + popular theme selectors.
+            var headerSelectors = [
+                'header', '.site-header', '#masthead', '.header', '#header',
+                '.wp-site-header', '[role="banner"]',
+                // Elementor
+                '.elementor-location-header', '[data-elementor-type="header"]',
+                '.ehf-header', '#ehf-header',
+                // Astra / GeneratePress / OceanWP
+                '.ast-above-header', '.ast-main-header-wrap', '.ast-below-header',
+                '.site-header-wrapper', '#site-header'
+            ].join(', ');
+
+            var footerSelectors = [
+                'footer', '.site-footer', '#colophon', '.footer', '#footer',
+                '.wp-site-footer', '[role="contentinfo"]',
+                // Elementor
+                '.elementor-location-footer', '[data-elementor-type="footer"]',
+                '.ehf-footer', '#ehf-footer',
+                // Astra / GeneratePress / OceanWP
+                '.ast-footer-overlay', '.site-footer-wrapper', '#site-footer'
+            ].join(', ');
+
+            var titleSelectors = [
+                '.entry-title', '.page-title', '.post-title',
+                '.entry-header', '.page-header',
+                // Elementor
+                '.elementor-page-title', '.elementor-widget-theme-page-title',
+                '[data-widget_type="theme-page-title.default"]',
+                // Common themes
+                '.ast-the-title', '.hentry .entry-title',
+                '.wp-block-post-title', '#page-title-wrapper'
+            ].join(', ');
+
+            if (hideHeader) {
+                $(headerSelectors).addClass('ec-hidden');
+            }
+            if (hideFooter) {
+                $(footerSelectors).addClass('ec-hidden');
+            }
+            if (hideTitle) {
+                $(titleSelectors).addClass('ec-hidden');
+            }
 
             if (hideHeader || hideFooter) {
-                // Common WP theme header/footer selectors.
-                var headerSelectors = 'header, .site-header, #masthead, .header, #header, .wp-site-header, [role="banner"]';
-                var footerSelectors = 'footer, .site-footer, #colophon, .footer, #footer, .wp-site-footer, [role="contentinfo"]';
-
-                if (hideHeader) {
-                    $(headerSelectors).addClass('ec-hidden');
-                }
-                if (hideFooter) {
-                    $(footerSelectors).addClass('ec-hidden');
-                }
-
-                // Add fullscreen class to the app.
-                $app.addClass('ec-form-fullscreen');
-
-                // Also hide WP admin bar if present.
+                // Hide WP admin bar if present.
                 $('#wpadminbar').addClass('ec-hidden');
                 $('html').css('margin-top', '0');
             }
+
+            // Calculate available height dynamically.
+            // If header/footer are NOT hidden, measure them and set height accordingly.
+            var self = this;
+            setTimeout(function() {
+                var usedHeight = 0;
+
+                if (!hideHeader) {
+                    $(headerSelectors.split(', ').join(', ')).not('.ec-hidden').each(function() {
+                        var h = $(this).outerHeight(true);
+                        if (h > usedHeight) usedHeight = h; // Take the tallest header element.
+                    });
+                }
+                if (!hideFooter) {
+                    $(footerSelectors.split(', ').join(', ')).not('.ec-hidden').each(function() {
+                        usedHeight += $(this).outerHeight(true);
+                    });
+                }
+
+                if (usedHeight > 0) {
+                    // Set form height to viewport minus header+footer.
+                    $app.css('height', 'calc(100vh - ' + usedHeight + 'px)');
+                    $app.css('max-height', 'calc(100vh - ' + usedHeight + 'px)');
+                } else {
+                    // Full viewport when everything is hidden.
+                    $app.addClass('ec-form-fullscreen');
+                }
+            }, 100);
         },
 
         // ── Navigation ──

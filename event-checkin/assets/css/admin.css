@@ -1,51 +1,120 @@
 /**
  * Event Check-in - Admin Styles
+ * Istanbul Edition Design Language
  */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+/* Admin pages font override */
+.toplevel_page_event-checkin .wrap,
+[class*="event-check-in_page_"] .wrap {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Headings */
+.toplevel_page_event-checkin .wrap h1,
+[class*="event-check-in_page_"] .wrap h1 {
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: #002d72;
+}
 
 /* Status badges */
 .ec-status {
     display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.1em;
+    border: 2px solid;
 }
 
 .ec-status--draft {
-    background: #f0f0f1;
+    border-color: rgba(0, 45, 114, 0.2);
     color: #50575e;
+    background: transparent;
 }
 
 .ec-status--published {
-    background: #d1fae5;
-    color: #065f46;
+    border-color: #0babe4;
+    color: #002d72;
+    background: rgba(11, 171, 228, 0.08);
 }
 
 .ec-status--closed {
-    background: #fee2e2;
+    border-color: #dc2626;
     color: #991b1b;
+    background: rgba(220, 38, 38, 0.05);
 }
 
 .ec-status--archived {
-    background: #e5e7eb;
+    border-color: rgba(0, 45, 114, 0.15);
     color: #4b5563;
+    background: transparent;
 }
 
 .ec-status--registered {
-    background: #dbeafe;
-    color: #1e40af;
+    border-color: #002d72;
+    color: #002d72;
+    background: rgba(0, 45, 114, 0.05);
 }
 
 .ec-status--checked_in {
-    background: #d1fae5;
-    color: #065f46;
+    border-color: #0babe4;
+    color: #002d72;
+    background: rgba(11, 171, 228, 0.08);
 }
 
 .ec-status--cancelled {
-    background: #fee2e2;
+    border-color: #dc2626;
     color: #991b1b;
+    background: rgba(220, 38, 38, 0.05);
+}
+
+/* Table styling */
+.toplevel_page_event-checkin .wp-list-table,
+[class*="event-check-in_page_"] .wp-list-table {
+    border: 2px solid rgba(0, 45, 114, 0.1);
+}
+
+.toplevel_page_event-checkin .wp-list-table thead th,
+[class*="event-check-in_page_"] .wp-list-table thead th {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(0, 45, 114, 0.5);
+    border-bottom: 2px solid rgba(0, 45, 114, 0.1);
+}
+
+/* Buttons */
+.toplevel_page_event-checkin .button,
+[class*="event-check-in_page_"] .button {
+    border-radius: 0;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+}
+
+.toplevel_page_event-checkin .page-title-action,
+[class*="event-check-in_page_"] .page-title-action {
+    border-radius: 0 !important;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border: 2px solid #002d72 !important;
+    color: #002d72 !important;
+    background: transparent !important;
+    transition: all 0.2s ease;
+}
+
+.toplevel_page_event-checkin .page-title-action:hover,
+[class*="event-check-in_page_"] .page-title-action:hover {
+    background: #002d72 !important;
+    color: #fff !important;
 }
 
 /* Custom fields builder */
@@ -58,37 +127,110 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 8px;
-    padding: 10px;
-    background: #f6f7f7;
-    border: 1px solid #dcdcde;
-    border-radius: 4px;
+    padding: 12px;
+    background: rgba(0, 45, 114, 0.02);
+    border: 2px solid rgba(0, 45, 114, 0.1);
 }
 
 .ec-custom-field input[type="text"] {
     flex: 1;
+    border-radius: 0;
 }
 
 .ec-custom-field select {
     width: 120px;
+    border-radius: 0;
 }
 
 .ec-custom-field .ec-remove-field {
-    color: #d63638;
-    border-color: #d63638;
+    color: #dc2626;
+    border-color: #dc2626;
     min-width: 30px;
     padding: 0 8px;
+    border-radius: 0;
 }
 
 /* Shortcode display */
-code {
+.toplevel_page_event-checkin code,
+[class*="event-check-in_page_"] code {
     display: inline-block;
     margin: 2px 4px;
-    padding: 2px 6px;
-    background: #f0f0f1;
-    font-size: 12px;
+    padding: 3px 8px;
+    background: rgba(0, 45, 114, 0.05);
+    border: 1px solid rgba(0, 45, 114, 0.1);
+    font-size: 11px;
+    color: #002d72;
+    border-radius: 0;
 }
 
-/* Event form */
+/* Form table */
 #ec-event-form .form-table th {
     width: 200px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(0, 45, 114, 0.6);
+    vertical-align: top;
+    padding-top: 18px;
+}
+
+#ec-event-form input[type="text"],
+#ec-event-form input[type="number"],
+#ec-event-form input[type="datetime-local"],
+#ec-event-form textarea,
+#ec-event-form select {
+    border-radius: 0;
+    border: 2px solid rgba(0, 45, 114, 0.2);
+    transition: border-color 0.2s ease;
+}
+
+#ec-event-form input:focus,
+#ec-event-form textarea:focus,
+#ec-event-form select:focus {
+    border-color: #0babe4;
+    box-shadow: none;
+    outline: none;
+}
+
+/* Submit button */
+#ec-event-form #submit,
+[class*="event-check-in_page_"] #submit {
+    border-radius: 0 !important;
+    background: #002d72 !important;
+    border-color: #002d72 !important;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 8px 24px;
+    height: auto;
+}
+
+#ec-event-form #submit:hover,
+[class*="event-check-in_page_"] #submit:hover {
+    background: #00122e !important;
+    border-color: #00122e !important;
+}
+
+/* Email template editor */
+#ec_email_template {
+    border: 2px solid rgba(0, 45, 114, 0.2) !important;
+    border-radius: 0 !important;
+}
+
+#ec_email_template:focus {
+    border-color: #0babe4 !important;
+    box-shadow: none !important;
+}
+
+/* Export button */
+.button.ec-export-btn {
+    border: 2px solid #002d72;
+    color: #002d72;
+    background: transparent;
+}
+
+.button.ec-export-btn:hover {
+    background: #002d72;
+    color: #fff;
 }

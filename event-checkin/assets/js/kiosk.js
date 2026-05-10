@@ -14,6 +14,8 @@
         countdownInterval: null,
         currentToken: null,
         isProcessing: false,
+        lastScanTime: 0,
+        scanDebounceMs: 2000,
         offlineQueue: [],
 
         init: function () {
@@ -80,6 +82,12 @@
          */
         onScanSuccess: function (decodedText) {
             if (this.isProcessing) return;
+
+            // Debounce: ignore rapid duplicate scans.
+            var now = Date.now();
+            if (now - this.lastScanTime < this.scanDebounceMs) return;
+            this.lastScanTime = now;
+
             this.isProcessing = true;
 
             // Extract token from URL or use raw value.
@@ -287,6 +295,22 @@
         /**
          * Show a specific screen.
          */
+        /**
+         * Update the step progress indicator.
+         */
+        updateStepProgress: function (activeStep) {
+            for (var i = 1; i <= 3; i++) {
+                var el = document.getElementById('ec-step-' + i);
+                if (!el) continue;
+                el.classList.remove('active', 'done');
+                if (i < activeStep) {
+                    el.classList.add('done');
+                } else if (i === activeStep) {
+                    el.classList.add('active');
+                }
+            }
+        },
+
         showScreen: function (screen, message, data) {
             // Hide all screens.
             var screens = document.querySelectorAll('.ec-kiosk-screen');
@@ -299,6 +323,17 @@
             if (target) {
                 target.classList.add('active');
             }
+
+            // Update step progress.
+            var stepMap = {
+                'scanner': 1,
+                'processing': 1,
+                'signature': 2,
+                'success': 3,
+                'already': 3,
+                'error': 1,
+            };
+            this.updateStepProgress(stepMap[screen] || 1);
 
             // Set dynamic content.
             switch (screen) {

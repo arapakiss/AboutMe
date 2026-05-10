@@ -15,6 +15,7 @@ class Admin {
         add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
         add_action( 'admin_post_ec_save_event', array( __CLASS__, 'handle_save_event' ) );
         add_action( 'admin_post_ec_delete_event', array( __CLASS__, 'handle_delete_event' ) );
+        add_action( 'admin_post_ec_save_email_template', array( __CLASS__, 'handle_save_email_template' ) );
     }
 
     /**
@@ -57,6 +58,15 @@ class Admin {
             'ec-registrations',
             array( __CLASS__, 'render_registrations_page' )
         );
+
+        add_submenu_page(
+            'event-checkin',
+            __( 'Email Template', 'event-checkin' ),
+            __( 'Email Template', 'event-checkin' ),
+            'ec_manage_settings',
+            'ec-email-template',
+            array( __CLASS__, 'render_email_template_page' )
+        );
     }
 
     /**
@@ -69,6 +79,7 @@ class Admin {
             'toplevel_page_event-checkin',
             'event-check-in_page_ec-add-event',
             'event-check-in_page_ec-registrations',
+            'event-check-in_page_ec-email-template',
         );
 
         if ( ! in_array( $hook, $ec_pages, true ) ) {
@@ -474,5 +485,140 @@ class Admin {
             </table>
         </div>
         <?php
+    }
+
+    /**
+     * Render the email template editor page.
+     */
+    public static function render_email_template_page() {
+        $template = Email::get_template();
+        $subject  = Email::get_subject_template();
+        $saved    = isset( $_GET['updated'] ) && $_GET['updated'] === '1';
+        $reset    = isset( $_GET['reset'] ) && $_GET['reset'] === '1';
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'Email Template', 'event-checkin' ); ?></h1>
+
+            <?php if ( $saved ) : ?>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Email template saved.', 'event-checkin' ); ?></p></div>
+            <?php endif; ?>
+            <?php if ( $reset ) : ?>
+                <div class="notice notice-info is-dismissible"><p><?php esc_html_e( 'Email template reset to default.', 'event-checkin' ); ?></p></div>
+            <?php endif; ?>
+
+            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                <input type="hidden" name="action" value="ec_save_email_template">
+                <?php wp_nonce_field( 'ec_save_email_template', 'ec_nonce' ); ?>
+
+                <table class="form-table">
+                    <tr>
+                        <th><label for="ec_email_subject"><?php esc_html_e( 'Email Subject', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <input type="text" id="ec_email_subject" name="ec_email_subject" value="<?php echo esc_attr( $subject ); ?>" class="large-text">
+                            <p class="description"><?php esc_html_e( 'Available variables: {first_name}, {last_name}, {event_title}, {event_date}, {site_name}', 'event-checkin' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ec_email_template"><?php esc_html_e( 'HTML Email Body', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <p class="description" style="margin-bottom: 8px;">
+                                <?php esc_html_e( 'Available variables: {first_name}, {last_name}, {event_title}, {event_date}, {event_location}, {qr_code_url}, {site_name}', 'event-checkin' ); ?>
+                            </p>
+                            <textarea id="ec_email_template" name="ec_email_template" rows="30" class="large-text code" style="font-family: monospace; font-size: 13px;"><?php echo esc_textarea( $template ); ?></textarea>
+                        </td>
+                    </tr>
+                </table>
+
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <?php submit_button( __( 'Save Template', 'event-checkin' ), 'primary', 'submit', false ); ?>
+                    <button type="submit" name="ec_reset_template" value="1" class="button button-secondary" onclick="return confirm('<?php esc_attr_e( 'Reset to default template?', 'event-checkin' ); ?>');">
+                        <?php esc_html_e( 'Reset to Default', 'event-checkin' ); ?>
+                    </button>
+                </div>
+            </form>
+
+            <h2 style="margin-top: 30px;"><?php esc_html_e( 'Preview', 'event-checkin' ); ?></h2>
+            <div style="border: 1px solid #dcdcde; border-radius: 4px; overflow: hidden; max-width: 640px;">
+                <iframe id="ec-email-preview" style="width: 100%; height: 600px; border: none;"></iframe>
+            </div>
+            <script>
+            (function() {
+                function updatePreview() {
+                    var html = document.getElementById('ec_email_template').value;
+                    // Replace variables with sample data.
+                    html = html.replace(/\{first_name\}/g, 'John');
+                    html = html.replace(/\{last_name\}/g, 'Doe');
+                    html = html.replace(/\{event_title\}/g, 'Sample Conference 2025');
+                    html = html.replace(/\{event_date\}/g, '15 June 2025 10:00');
+                    html = html.replace(/\{event_location\}/g, 'Athens Convention Center');
+                    html = html.replace(/\{qr_code_url\}/g, 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=sample');
+                    html = html.replace(/\{site_name\}/g, '<?php echo esc_js( get_bloginfo( "name" ) ); ?>');
+                    var iframe = document.getElementById('ec-email-preview');
+                    var doc = iframe.contentDocument || iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+                }
+                document.getElementById('ec_email_template').addEventListener('input', updatePreview);
+                setTimeout(updatePreview, 100);
+            })();
+            </script>
+        </div>
+        <?php
+    }
+
+    /**
+     * Handle saving the email template.
+     */
+    public static function handle_save_email_template() {
+        if ( ! current_user_can( 'ec_manage_settings' ) ) {
+            wp_die( esc_html__( 'Unauthorized', 'event-checkin' ), 403 );
+        }
+
+        check_admin_referer( 'ec_save_email_template', 'ec_nonce' );
+
+        if ( ! empty( $_POST['ec_reset_template'] ) ) {
+            delete_option( Email::OPTION_TEMPLATE );
+            delete_option( Email::OPTION_SUBJECT );
+            wp_safe_redirect( admin_url( 'admin.php?page=ec-email-template&reset=1' ) );
+            exit;
+        }
+
+        $subject  = sanitize_text_field( $_POST['ec_email_subject'] ?? '' );
+        // Allow HTML in template but sanitize with wp_kses_post for safety.
+        $template = wp_kses_post( $_POST['ec_email_template'] ?? '' );
+
+        // However, email templates need full HTML including style attributes,
+        // so we use a more permissive sanitization.
+        $allowed_html = wp_kses_allowed_html( 'post' );
+        $allowed_html['style'] = array();
+        $allowed_html['meta']  = array( 'charset' => true, 'name' => true, 'content' => true, 'http-equiv' => true );
+        $allowed_html['link']  = array( 'href' => true, 'rel' => true, 'type' => true );
+        // Allow style attributes on all elements.
+        foreach ( $allowed_html as $tag => $attrs ) {
+            if ( is_array( $attrs ) ) {
+                $allowed_html[ $tag ]['style'] = true;
+                $allowed_html[ $tag ]['align'] = true;
+                $allowed_html[ $tag ]['width'] = true;
+                $allowed_html[ $tag ]['height'] = true;
+                $allowed_html[ $tag ]['bgcolor'] = true;
+                $allowed_html[ $tag ]['cellpadding'] = true;
+                $allowed_html[ $tag ]['cellspacing'] = true;
+                $allowed_html[ $tag ]['border'] = true;
+                $allowed_html[ $tag ]['role'] = true;
+            }
+        }
+
+        $template = wp_kses( $_POST['ec_email_template'] ?? '', $allowed_html );
+
+        if ( $subject ) {
+            update_option( Email::OPTION_SUBJECT, $subject );
+        }
+        if ( $template ) {
+            update_option( Email::OPTION_TEMPLATE, $template );
+        }
+
+        wp_safe_redirect( admin_url( 'admin.php?page=ec-email-template&updated=1' ) );
+        exit;
     }
 }

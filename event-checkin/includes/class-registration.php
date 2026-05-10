@@ -341,8 +341,20 @@ class Registration {
         // Generate QR code.
         $qr_url = QRCode::generate( $qr_token, $event_id );
 
-        // Send confirmation email.
-        self::send_confirmation_email( $email, $first_name, $last_name, $event, $qr_token, $qr_url );
+        // Queue confirmation email (non-blocking).
+        $upload_dir = wp_upload_dir();
+        $qr_file    = $upload_dir['basedir'] . '/event-checkin/qrcodes/qr-' . substr( $qr_token, 0, 16 ) . '.png';
+        $event_date = wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $event->event_date ) );
+
+        Email::queue( $email, array(
+            'first_name'     => $first_name,
+            'last_name'      => $last_name,
+            'event_title'    => $event->title,
+            'event_date'     => $event_date,
+            'event_location' => $event->location ?: '',
+            'qr_code_url'    => $qr_url ?: '',
+            'site_name'      => get_bloginfo( 'name' ),
+        ), $qr_file );
 
         wp_send_json_success( array(
             'message' => __( 'Registration successful! Check your email for the QR code.', 'event-checkin' ),
@@ -351,59 +363,29 @@ class Registration {
     }
 
     /**
-     * Send a confirmation email with the QR code.
+     * Get event data with transient caching for high-traffic scenarios.
      *
-     * @param string   $email      Recipient email.
-     * @param string   $first_name First name.
-     * @param string   $last_name  Last name.
-     * @param object   $event      Event object.
-     * @param string   $qr_token   QR token.
-     * @param string   $qr_url     URL to QR code image.
+     * @param int $event_id Event ID.
+     * @return object|null Event object or null.
      */
-    private static function send_confirmation_email( $email, $first_name, $last_name, $event, $qr_token, $qr_url ) {
-        $site_name = get_bloginfo( 'name' );
-        $subject   = sprintf(
-            /* translators: %1$s: event title, %2$s: site name */
-            __( 'Registration Confirmation: %1$s - %2$s', 'event-checkin' ),
-            $event->title,
-            $site_name
-        );
+    public static function get_cached_event( $event_id ) {
+        $cache_key = 'ec_event_' . $event_id;
+        $event     = get_transient( $cache_key );
 
-        $event_date = wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $event->event_date ) );
+        if ( false === $event ) {
+            global $wpdb;
+            $event = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT * FROM {$wpdb->prefix}ec_events WHERE id = %d",
+                    $event_id
+                )
+            );
 
-        $message = sprintf(
-            __( 'Hello %1$s %2$s,', 'event-checkin' ),
-            $first_name,
-            $last_name
-        ) . "\n\n";
-
-        $message .= sprintf(
-            __( 'Thank you for registering for "%s".', 'event-checkin' ),
-            $event->title
-        ) . "\n\n";
-
-        $message .= __( 'Event Details:', 'event-checkin' ) . "\n";
-        $message .= sprintf( __( 'Date: %s', 'event-checkin' ), $event_date ) . "\n";
-
-        if ( $event->location ) {
-            $message .= sprintf( __( 'Location: %s', 'event-checkin' ), $event->location ) . "\n";
+            if ( $event ) {
+                set_transient( $cache_key, $event, 300 ); // Cache for 5 minutes.
+            }
         }
 
-        $message .= "\n" . __( 'Your QR Code:', 'event-checkin' ) . "\n";
-        $message .= $qr_url . "\n\n";
-        $message .= __( 'Please present this QR code at the event entrance for check-in.', 'event-checkin' ) . "\n\n";
-        $message .= sprintf( __( 'Best regards,%s%s', 'event-checkin' ), "\n", $site_name );
-
-        $headers = array( 'Content-Type: text/plain; charset=UTF-8' );
-
-        // Attach QR code image if available.
-        $attachments = array();
-        $upload_dir  = wp_upload_dir();
-        $qr_file     = $upload_dir['basedir'] . '/event-checkin/qrcodes/qr-' . substr( $qr_token, 0, 16 ) . '.png';
-        if ( file_exists( $qr_file ) ) {
-            $attachments[] = $qr_file;
-        }
-
-        wp_mail( $email, $subject, $message, $headers, $attachments );
+        return $event;
     }
 }

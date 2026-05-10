@@ -117,67 +117,102 @@ class Checkin {
         ob_start();
         ?>
         <div class="ec-kiosk" id="ec-kiosk" data-event-id="<?php echo intval( $event_id ); ?>" data-require-signature="<?php echo intval( $event->require_signature ); ?>">
-            <!-- Scanner Screen -->
-            <div class="ec-kiosk-screen ec-kiosk-screen--scanner active" id="ec-screen-scanner">
-                <div class="ec-kiosk-header">
-                    <h1><?php echo esc_html( $event->title ); ?></h1>
-                    <p class="ec-kiosk-prompt"><?php esc_html_e( 'Scan your QR code to check in', 'event-checkin' ); ?></p>
+            <!-- Left Hero Panel (desktop) -->
+            <div class="ec-kiosk-hero">
+                <div class="ec-kiosk-hero-ghost">
+                    <span><?php esc_html_e( 'Welcome', 'event-checkin' ); ?></span>
                 </div>
-                <div class="ec-scanner-viewport" id="ec-scanner-viewport"></div>
-                <div class="ec-kiosk-stats">
-                    <span id="ec-stats-total">0</span> <?php esc_html_e( 'registered', 'event-checkin' ); ?> |
-                    <span id="ec-stats-checkedin">0</span> <?php esc_html_e( 'checked in', 'event-checkin' ); ?>
-                </div>
-            </div>
-
-            <!-- Processing Screen -->
-            <div class="ec-kiosk-screen ec-kiosk-screen--processing" id="ec-screen-processing">
-                <div class="ec-spinner"></div>
-                <p><?php esc_html_e( 'Processing...', 'event-checkin' ); ?></p>
-            </div>
-
-            <!-- Signature Screen -->
-            <div class="ec-kiosk-screen ec-kiosk-screen--signature" id="ec-screen-signature">
-                <h2><?php esc_html_e( 'Please sign below to complete check-in', 'event-checkin' ); ?></h2>
-                <p class="ec-welcome-name" id="ec-signature-name"></p>
-                <div class="ec-signature-wrapper">
-                    <canvas id="ec-signature-pad" width="600" height="200"></canvas>
-                </div>
-                <div class="ec-signature-actions">
-                    <button type="button" class="ec-btn ec-btn--secondary" id="ec-sig-clear"><?php esc_html_e( 'Clear', 'event-checkin' ); ?></button>
-                    <button type="button" class="ec-btn ec-btn--primary" id="ec-sig-confirm"><?php esc_html_e( 'Confirm', 'event-checkin' ); ?></button>
+                <div class="ec-kiosk-hero-content">
+                    <h1><?php esc_html_e( 'Self Check-In', 'event-checkin' ); ?></h1>
+                    <p><?php esc_html_e( 'Experience seamless arrival with our quick and easy check-in process.', 'event-checkin' ); ?></p>
+                    <p class="ec-powered"><?php echo esc_html( $event->title ); ?></p>
                 </div>
             </div>
 
-            <!-- Success Screen -->
-            <div class="ec-kiosk-screen ec-kiosk-screen--success" id="ec-screen-success">
-                <div class="ec-success-checkmark">&#10003;</div>
-                <h2 id="ec-success-message"><?php esc_html_e( 'Check-in successful!', 'event-checkin' ); ?></h2>
-                <p class="ec-welcome-name" id="ec-success-name"></p>
-                <div class="ec-auto-reset">
-                    <p><?php esc_html_e( 'Returning to scanner...', 'event-checkin' ); ?></p>
-                    <div class="ec-countdown-bar"><div class="ec-countdown-fill" id="ec-countdown-fill"></div></div>
+            <!-- Right Workflow Panel -->
+            <div class="ec-kiosk-workflow">
+                <!-- Progress Steps -->
+                <div class="ec-kiosk-progress">
+                    <div class="ec-step">
+                        <div class="ec-step-number active" id="ec-step-1">1</div>
+                        <span class="ec-step-label"><?php esc_html_e( 'Scan', 'event-checkin' ); ?></span>
+                    </div>
+                    <div class="ec-step-divider"></div>
+                    <div class="ec-step">
+                        <div class="ec-step-number" id="ec-step-2">2</div>
+                        <span class="ec-step-label"><?php echo $event->require_signature ? esc_html__( 'Sign', 'event-checkin' ) : esc_html__( 'Verify', 'event-checkin' ); ?></span>
+                    </div>
+                    <div class="ec-step-divider"></div>
+                    <div class="ec-step">
+                        <div class="ec-step-number" id="ec-step-3">3</div>
+                        <span class="ec-step-label"><?php esc_html_e( 'Done', 'event-checkin' ); ?></span>
+                    </div>
+                    <div class="ec-kiosk-event-title">
+                        <h2><span class="accent"><?php esc_html_e( 'Welcome', 'event-checkin' ); ?></span> <?php esc_html_e( 'Guest', 'event-checkin' ); ?></h2>
+                        <p><?php esc_html_e( 'Your journey starts here', 'event-checkin' ); ?></p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Already Checked In Screen -->
-            <div class="ec-kiosk-screen ec-kiosk-screen--already" id="ec-screen-already">
-                <div class="ec-already-icon">&#8505;</div>
-                <h2><?php esc_html_e( 'Already checked in', 'event-checkin' ); ?></h2>
-                <p class="ec-welcome-name" id="ec-already-name"></p>
-                <div class="ec-auto-reset">
-                    <p><?php esc_html_e( 'Returning to scanner...', 'event-checkin' ); ?></p>
-                    <div class="ec-countdown-bar"><div class="ec-countdown-fill" id="ec-countdown-fill-already"></div></div>
+                <!-- Scanner Screen -->
+                <div class="ec-kiosk-screen ec-kiosk-screen--scanner active" id="ec-screen-scanner">
+                    <h3 class="ec-section-title"><?php esc_html_e( 'Scan your QR code', 'event-checkin' ); ?></h3>
+                    <p class="ec-label"><?php esc_html_e( 'Hold your QR code up to the camera', 'event-checkin' ); ?></p>
+                    <div class="ec-scanner-viewport" id="ec-scanner-viewport"></div>
+                    <div class="ec-kiosk-stats">
+                        <span id="ec-stats-total">0</span> <?php esc_html_e( 'registered', 'event-checkin' ); ?> |
+                        <span id="ec-stats-checkedin">0</span> <?php esc_html_e( 'checked in', 'event-checkin' ); ?>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Error Screen -->
-            <div class="ec-kiosk-screen ec-kiosk-screen--error" id="ec-screen-error">
-                <div class="ec-error-icon">&#10007;</div>
-                <h2 id="ec-error-message"><?php esc_html_e( 'An error occurred', 'event-checkin' ); ?></h2>
-                <div class="ec-auto-reset">
-                    <p><?php esc_html_e( 'Returning to scanner...', 'event-checkin' ); ?></p>
-                    <div class="ec-countdown-bar"><div class="ec-countdown-fill" id="ec-countdown-fill-error"></div></div>
+                <!-- Processing Screen -->
+                <div class="ec-kiosk-screen ec-kiosk-screen--processing" id="ec-screen-processing">
+                    <div class="ec-spinner"></div>
+                    <p><?php esc_html_e( 'Processing...', 'event-checkin' ); ?></p>
+                </div>
+
+                <!-- Signature Screen -->
+                <div class="ec-kiosk-screen ec-kiosk-screen--signature" id="ec-screen-signature">
+                    <h3 class="ec-section-title"><?php esc_html_e( 'Sign to confirm', 'event-checkin' ); ?></h3>
+                    <p class="ec-welcome-name" id="ec-signature-name"></p>
+                    <div class="ec-signature-wrapper">
+                        <canvas id="ec-signature-pad" width="600" height="200"></canvas>
+                    </div>
+                    <div class="ec-signature-actions">
+                        <button type="button" class="ec-btn ec-btn--secondary" id="ec-sig-clear"><?php esc_html_e( 'Clear', 'event-checkin' ); ?></button>
+                        <button type="button" class="ec-btn ec-btn--primary" id="ec-sig-confirm"><?php esc_html_e( 'Confirm & Check-In', 'event-checkin' ); ?></button>
+                    </div>
+                </div>
+
+                <!-- Success Screen -->
+                <div class="ec-kiosk-screen ec-kiosk-screen--success" id="ec-screen-success">
+                    <div class="ec-success-checkmark">&#10003;</div>
+                    <h2 class="ec-section-title" id="ec-success-message"><?php esc_html_e( 'Check-in complete', 'event-checkin' ); ?></h2>
+                    <p class="ec-welcome-name" id="ec-success-name"></p>
+                    <div class="ec-auto-reset">
+                        <p><?php esc_html_e( 'Returning to scanner...', 'event-checkin' ); ?></p>
+                        <div class="ec-countdown-bar"><div class="ec-countdown-fill" id="ec-countdown-fill"></div></div>
+                    </div>
+                </div>
+
+                <!-- Already Checked In Screen -->
+                <div class="ec-kiosk-screen ec-kiosk-screen--already" id="ec-screen-already">
+                    <div class="ec-already-icon">&#8505;</div>
+                    <h2 class="ec-section-title"><?php esc_html_e( 'Already checked in', 'event-checkin' ); ?></h2>
+                    <p class="ec-welcome-name" id="ec-already-name"></p>
+                    <div class="ec-auto-reset">
+                        <p><?php esc_html_e( 'Returning to scanner...', 'event-checkin' ); ?></p>
+                        <div class="ec-countdown-bar"><div class="ec-countdown-fill" id="ec-countdown-fill-already"></div></div>
+                    </div>
+                </div>
+
+                <!-- Error Screen -->
+                <div class="ec-kiosk-screen ec-kiosk-screen--error" id="ec-screen-error">
+                    <div class="ec-error-icon">&#10007;</div>
+                    <h2 class="ec-section-title" id="ec-error-message"><?php esc_html_e( 'An error occurred', 'event-checkin' ); ?></h2>
+                    <div class="ec-auto-reset">
+                        <p><?php esc_html_e( 'Returning to scanner...', 'event-checkin' ); ?></p>
+                        <div class="ec-countdown-bar"><div class="ec-countdown-fill" id="ec-countdown-fill-error"></div></div>
+                    </div>
                 </div>
             </div>
         </div>

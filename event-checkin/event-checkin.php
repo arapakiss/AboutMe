@@ -57,6 +57,7 @@ register_deactivation_hook( __FILE__, 'ec_deactivate' );
 require_once EC_PLUGIN_DIR . 'includes/class-activator.php';
 require_once EC_PLUGIN_DIR . 'includes/class-security.php';
 require_once EC_PLUGIN_DIR . 'includes/class-roles.php';
+require_once EC_PLUGIN_DIR . 'includes/class-email.php';
 require_once EC_PLUGIN_DIR . 'includes/class-admin.php';
 require_once EC_PLUGIN_DIR . 'includes/class-rest-api.php';
 require_once EC_PLUGIN_DIR . 'includes/class-registration.php';
@@ -68,6 +69,7 @@ require_once EC_PLUGIN_DIR . 'includes/class-export.php';
 add_action( 'plugins_loaded', function () {
     EventCheckin\Security::init();
     EventCheckin\Roles::init();
+    EventCheckin\Email::init();
     EventCheckin\Admin::init();
     EventCheckin\Rest_API::init();
     EventCheckin\Registration::init();

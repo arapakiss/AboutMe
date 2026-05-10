@@ -34,6 +34,7 @@
             Object.keys(cats).forEach(function(catKey) {
                 var $cat = $('<div class="ec-palette-category">');
                 $cat.append('<div class="ec-palette-category-title">' + cats[catKey] + '</div>');
+                var $items = $('<div class="ec-palette-category-items">');
 
                 Object.keys(types).forEach(function(typeKey) {
                     var t = types[typeKey];
@@ -41,19 +42,21 @@
                     var $field = $('<div class="ec-palette-field" data-type="' + typeKey + '">')
                         .append('<span class="ec-palette-field-icon">' + t.icon + '</span>')
                         .append('<span>' + t.label + '</span>');
-                    $cat.append($field);
+                    $items.append($field);
                 });
 
+                $cat.append($items);
                 $palette.append($cat);
-            });
 
-            // Make palette fields draggable.
-            new Sortable($palette[0], {
-                group: { name: 'fields', pull: 'clone', put: false },
-                sort: false,
-                draggable: '.ec-palette-field',
-                ghostClass: 'sortable-ghost',
-                onEnd: function() {}
+                // Initialize Sortable on each category's items container
+                // so draggable fields are direct children of the sortable element.
+                new Sortable($items[0], {
+                    group: { name: 'fields', pull: 'clone', put: false },
+                    sort: false,
+                    draggable: '.ec-palette-field',
+                    ghostClass: 'sortable-ghost',
+                    onEnd: function() {}
+                });
             });
         },
 
@@ -81,6 +84,15 @@
                 if (!self.eventId) { alert('Select an event first.'); return; }
                 self.createFormPage();
             });
+
+            // Import / Export.
+            $('#ec-export-form').on('click', function() { self.exportSchema(); });
+            $('#ec-import-form').on('click', function() { $('#ec-import-file').click(); });
+            $('#ec-import-file').on('change', function(e) { self.importSchema(e); });
+
+            // DeepL Translation.
+            $('#ec-deepl-test').on('click', function() { self.testDeepLKey(); });
+            $('#ec-deepl-translate').on('click', function() { self.generateTranslations(); });
         },
 
         // ── Load / Save ──
@@ -344,6 +356,10 @@
                     return 'Canvas signature pad';
                 case 'social':
                     return (field.platforms || []).join(', ');
+                case 'company_info':
+                    return 'Company info card';
+                case 'country':
+                    return 'Country selector';
                 default:
                     return '';
             }
@@ -626,6 +642,136 @@
             });
 
             return $group;
+        },
+
+        // ── DeepL Translation ──
+        testDeepLKey: function() {
+            var apiKey = $('#ec-deepl-api-key').val().trim();
+            if (!apiKey) { alert('Enter a DeepL API key first.'); return; }
+
+            var $btn = $('#ec-deepl-test');
+            $btn.text('Testing...').prop('disabled', true);
+
+            $.post(ecFormBuilder.ajaxUrl, {
+                action: 'ec_deepl_test_key',
+                nonce: ecFormBuilder.nonce,
+                api_key: apiKey
+            }, function(res) {
+                $btn.text('Test Key').prop('disabled', false);
+                if (res.success) {
+                    $('#ec-deepl-status').text('API key is valid.').css('color', '#16a34a');
+                } else {
+                    $('#ec-deepl-status').text(res.data.message || 'Invalid key').css('color', '#dc2626');
+                }
+            }).fail(function() {
+                $btn.text('Test Key').prop('disabled', false);
+                $('#ec-deepl-status').text('Request failed.').css('color', '#dc2626');
+            });
+        },
+
+        generateTranslations: function() {
+            if (!this.eventId || !this.schema) { alert('Select an event and save the form first.'); return; }
+
+            var apiKey = $('#ec-deepl-api-key').val().trim();
+            if (!apiKey) { alert('Enter a DeepL API key first.'); return; }
+
+            var languages = ['en'];
+            $('.ec-lang-checkbox:checked').each(function() {
+                var val = $(this).val();
+                if (val !== 'en') languages.push(val);
+            });
+
+            if (languages.length < 2) { alert('Select at least one language besides English.'); return; }
+
+            // Store languages in schema settings.
+            if (!this.schema.settings) this.schema.settings = {};
+            this.schema.settings.languages = languages;
+            this.schema.settings.deepl_api_key = apiKey;
+
+            var $btn = $('#ec-deepl-translate');
+            $btn.text('Translating...').prop('disabled', true);
+
+            var self = this;
+            $.post(ecFormBuilder.ajaxUrl, {
+                action: 'ec_deepl_translate_form',
+                nonce: ecFormBuilder.nonce,
+                event_id: this.eventId,
+                api_key: apiKey,
+                languages: languages
+            }, function(res) {
+                $btn.text('Generate Translations').prop('disabled', false);
+                if (res.success) {
+                    var msg = res.data.message || 'Done';
+                    if (res.data.warnings && res.data.warnings.length) {
+                        msg += ' (warnings: ' + res.data.warnings.join(', ') + ')';
+                    }
+                    $('#ec-deepl-status').text(msg).css('color', '#16a34a');
+                    self.showToast('Translations generated!');
+                } else {
+                    $('#ec-deepl-status').text(res.data.message || 'Error').css('color', '#dc2626');
+                }
+            }).fail(function() {
+                $btn.text('Generate Translations').prop('disabled', false);
+                $('#ec-deepl-status').text('Request failed.').css('color', '#dc2626');
+            });
+        },
+
+        // ── Import / Export ──
+        exportSchema: function() {
+            if (!this.schema) { alert('No form to export.'); return; }
+            var blob = new Blob([JSON.stringify(this.schema, null, 2)], { type: 'application/json' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'form-schema-' + (this.eventId || 'draft') + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            this.showToast('Form exported!');
+        },
+
+        importSchema: function(e) {
+            var self = this;
+            var file = e.target.files[0];
+            if (!file) return;
+
+            var reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    var imported = JSON.parse(evt.target.result);
+                    if (!imported || !imported.steps || !Array.isArray(imported.steps)) {
+                        alert('Invalid form schema: missing steps array.');
+                        return;
+                    }
+                    // Validate structure.
+                    imported.steps.forEach(function(step) {
+                        if (!step.fields || !Array.isArray(step.fields)) {
+                            step.fields = [];
+                        }
+                        if (!step.id) step.id = 'step_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+                        if (!step.title) step.title = 'Imported Step';
+                    });
+                    if (!imported.settings) {
+                        imported.settings = {
+                            submit_label: 'Submit Registration',
+                            success_message: 'Registration complete!',
+                            enable_review_step: true,
+                            enable_progress_bar: true
+                        };
+                    }
+                    self.schema = imported;
+                    self.currentStepIndex = 0;
+                    self.selectedFieldId = null;
+                    self.renderAll();
+                    self.showToast('Form imported successfully!');
+                } catch (err) {
+                    alert('Error parsing JSON file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            // Reset input so same file can be imported again.
+            e.target.value = '';
         },
 
         // ── Utilities ──

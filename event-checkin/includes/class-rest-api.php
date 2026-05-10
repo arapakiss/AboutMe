@@ -75,6 +75,25 @@ class Rest_API {
             ),
         ) );
 
+        // Form translations endpoint (public, for language switcher).
+        register_rest_route( self::NAMESPACE, '/translations/(?P<event_id>\d+)/(?P<lang>[a-z]{2})', array(
+            'methods'             => 'GET',
+            'callback'            => array( __CLASS__, 'handle_translations' ),
+            'permission_callback' => '__return_true',
+            'args'                => array(
+                'event_id' => array(
+                    'required'          => true,
+                    'type'              => 'integer',
+                    'sanitize_callback' => 'absint',
+                ),
+                'lang' => array(
+                    'required'          => true,
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ),
+            ),
+        ) );
+
         // Lookup registration by token (for kiosk pre-check).
         register_rest_route( self::NAMESPACE, '/lookup', array(
             'methods'             => 'POST',
@@ -216,5 +235,29 @@ class Rest_API {
                 'require_signature' => (bool) $registration->require_signature,
             ),
         ), 200 );
+    }
+
+    /**
+     * Handle translations API request.
+     * Returns the translation JSON for a given event and language.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response
+     */
+    public static function handle_translations( $request ) {
+        $event_id = absint( $request->get_param( 'event_id' ) );
+        $lang     = sanitize_text_field( $request->get_param( 'lang' ) );
+
+        if ( ! $event_id || ! $lang ) {
+            return new \WP_REST_Response( array( 'message' => 'Invalid parameters.' ), 400 );
+        }
+
+        $translations = DeepL_Translate::load_translations( $event_id, $lang );
+
+        if ( ! $translations ) {
+            return new \WP_REST_Response( array( 'message' => 'Translation not found.' ), 404 );
+        }
+
+        return new \WP_REST_Response( $translations, 200 );
     }
 }

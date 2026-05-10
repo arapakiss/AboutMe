@@ -12,6 +12,9 @@
         signaturePads: {},
         verifiedFields: {},
 
+        translations: {},
+        currentLang: 'en',
+
         init: function() {
             var $app = $('#ec-form-app');
             if (!$app.length) return;
@@ -26,6 +29,8 @@
             this.bindSignatures();
             this.bindOtpInputs();
             this.bindSubmit();
+            this.bindLanguageSwitcher();
+            this.bindCompanyCard();
         },
 
         // ── Navigation ──
@@ -343,6 +348,152 @@
                 $review.append(
                     '<div class="ec-ff-review-item"><span>' + label + '</span><b>' + $('<span>').text(value).html() + '</b></div>'
                 );
+            });
+        },
+
+        // ── Language Switcher ──
+        bindLanguageSwitcher: function() {
+            var self = this;
+            var $switcher = $('#ec-form-language');
+            if (!$switcher.length) return;
+
+            $switcher.on('change', function() {
+                var lang = $(this).val();
+                self.currentLang = lang;
+                self.loadTranslation(lang);
+            });
+        },
+
+        loadTranslation: function(lang) {
+            var self = this;
+            if (lang === 'en') {
+                // Reset to original labels.
+                location.reload();
+                return;
+            }
+
+            // Check if already cached.
+            if (self.translations[lang]) {
+                self.applyTranslation(self.translations[lang]);
+                return;
+            }
+
+            var eventId = $('#ec-form-app').data('event-id');
+            var url = ecFormRenderer.restUrl + '/translations/' + eventId + '/' + lang;
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                headers: { 'X-WP-Nonce': ecFormRenderer.restNonce },
+                success: function(res) {
+                    if (res && typeof res === 'object') {
+                        self.translations[lang] = res;
+                        self.applyTranslation(res);
+                    }
+                },
+                error: function() {
+                    // Translation file not available; keep English.
+                }
+            });
+        },
+
+        applyTranslation: function(trans) {
+            // Translate labels, placeholders, and button text.
+            $('.ec-ff-label').each(function() {
+                var original = $(this).text().replace(' *', '').trim();
+                if (trans[original]) {
+                    var isRequired = $(this).text().indexOf('*') !== -1;
+                    $(this).text(trans[original] + (isRequired ? ' *' : ''));
+                }
+            });
+
+            // Translate step titles.
+            $('.ec-form-step-title').each(function() {
+                var original = $(this).text().trim();
+                if (trans[original]) $(this).text(trans[original]);
+            });
+
+            // Translate button labels.
+            $('.ec-form-next').each(function() {
+                var t = trans['Continue'];
+                if (t) $(this).html(t + ' &rarr;');
+            });
+            $('.ec-form-prev').each(function() {
+                var t = trans['Back'];
+                if (t) $(this).text(t);
+            });
+
+            // Translate placeholders.
+            $('input[placeholder], textarea[placeholder]').each(function() {
+                var original = $(this).attr('placeholder');
+                if (original && trans[original]) {
+                    $(this).attr('placeholder', trans[original]);
+                }
+            });
+
+            // Translate select option labels.
+            $('select option').each(function() {
+                var original = $(this).text().trim();
+                if (original && trans[original]) {
+                    $(this).text(trans[original]);
+                }
+            });
+        },
+
+        // ── Company Info Card ──
+        bindCompanyCard: function() {
+            if (!$('.ec-ff-company-card').length) return;
+
+            // Live-update the company card as users fill in company fields.
+            $(document).on('input change', '[data-field-id*="company_name"] input, [name*="company_name"]', function() {
+                var val = $(this).val();
+                $('#ec-company-card-name').text(val || 'Company Name');
+            });
+
+            $(document).on('change', '[data-field-id*="company_type"] select, [name*="company_type"]', function() {
+                var text = $(this).find('option:selected').text();
+                if (text && text !== '-- Select --') {
+                    $('#ec-company-card-type').text(text);
+                }
+            });
+
+            $(document).on('input', '[data-field-id*="company_website"] input', function() {
+                var val = $(this).val();
+                var clean = val ? val.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
+                $('#ec-company-card-website').text(clean || '\u2014');
+            });
+
+            $(document).on('input change', '[data-field-id*="company_city"] input, [data-field-id*="company_country"] select', function() {
+                var city = $('[data-field-id*="company_city"] input').val() || '';
+                var country = $('[data-field-id*="company_country"] select option:selected').text() || '';
+                if (country === '-- Select Country --') country = '';
+                var loc = [city, country].filter(Boolean).join(', ');
+                $('#ec-company-card-location').text(loc || '\u2014');
+            });
+
+            $(document).on('input', '[data-field-id*="company_email"] input', function() {
+                $('#ec-company-card-email').text($(this).val() || '\u2014');
+            });
+
+            $(document).on('input', '[data-field-id*="company_phone"] input', function() {
+                var code = $(this).closest('.ec-ff').find('select').val() || '';
+                $('#ec-company-card-phone').text((code + ' ' + $(this).val()).trim() || '\u2014');
+            });
+
+            $(document).on('input', '[data-field-id*="company_description"] textarea', function() {
+                $('#ec-company-card-desc').text($(this).val());
+            });
+
+            // Logo preview.
+            $(document).on('change', '[data-field-id*="company_logo"] input[type="file"]', function() {
+                var file = this.files && this.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var $logo = $('#ec-company-logo-preview');
+                    $logo.html('<img src="' + e.target.result + '" alt="Logo">');
+                };
+                reader.readAsDataURL(file);
             });
         },
 

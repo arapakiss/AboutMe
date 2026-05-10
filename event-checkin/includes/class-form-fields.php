@@ -195,6 +195,30 @@ class Form_Fields {
                     'width'     => 'full',
                 ),
             ),
+            'country' => array(
+                'label'    => __( 'Country', 'event-checkin' ),
+                'icon'     => '&#127758;',
+                'category' => 'contact',
+                'defaults' => array(
+                    'label'       => __( 'Country', 'event-checkin' ),
+                    'required'    => false,
+                    'searchable'  => true,
+                    'width'       => 'half',
+                ),
+            ),
+            'company_info' => array(
+                'label'    => __( 'Company Info Card', 'event-checkin' ),
+                'icon'     => '&#127970;',
+                'category' => 'advanced',
+                'defaults' => array(
+                    'label'       => __( 'Company Information', 'event-checkin' ),
+                    'required'    => false,
+                    'show_logo'   => true,
+                    'show_desc'   => true,
+                    'show_social' => true,
+                    'width'       => 'full',
+                ),
+            ),
             'hidden' => array(
                 'label'    => __( 'Hidden Field', 'event-checkin' ),
                 'icon'     => '&#128065;',
@@ -294,10 +318,11 @@ class Form_Fields {
     public static function get_default_schema() {
         return array(
             'steps' => array(
+                // Step 1: Personal Details.
                 array(
                     'id'       => 'step_default_1',
-                    'title'    => __( 'Your Details', 'event-checkin' ),
-                    'subtitle' => __( 'Basic information', 'event-checkin' ),
+                    'title'    => __( 'Personal Details', 'event-checkin' ),
+                    'subtitle' => __( 'Tell us about yourself', 'event-checkin' ),
                     'kicker'   => __( 'Registration', 'event-checkin' ),
                     'fields'   => array(
                         array(
@@ -307,6 +332,7 @@ class Form_Fields {
                             'placeholder' => __( 'John', 'event-checkin' ),
                             'required'    => true,
                             'maxlength'   => 100,
+                            'pattern'     => '',
                             'width'       => 'half',
                         ),
                         array(
@@ -316,6 +342,7 @@ class Form_Fields {
                             'placeholder' => __( 'Doe', 'event-checkin' ),
                             'required'    => true,
                             'maxlength'   => 100,
+                            'pattern'     => '',
                             'width'       => 'half',
                         ),
                         array(
@@ -328,22 +355,262 @@ class Form_Fields {
                             'width'       => 'half',
                         ),
                         array(
-                            'id'          => 'field_phone',
+                            'id'          => 'field_mobile_phone',
                             'type'        => 'phone',
-                            'label'       => __( 'Phone', 'event-checkin' ),
+                            'label'       => __( 'Mobile Phone', 'event-checkin' ),
                             'placeholder' => '',
+                            'required'    => true,
+                            'verify'      => false,
+                            'country_codes' => array( '+30', '+33', '+44', '+49', '+1', '+48', '+90', '+34' ),
+                            'default_code'  => '+30',
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_country',
+                            'type'        => 'country',
+                            'label'       => __( 'Country', 'event-checkin' ),
+                            'required'    => true,
+                            'searchable'  => true,
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_city',
+                            'type'        => 'short_text',
+                            'label'       => __( 'City', 'event-checkin' ),
+                            'placeholder' => '',
+                            'required'    => false,
+                            'maxlength'   => 200,
+                            'pattern'     => '',
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_preferred_language',
+                            'type'        => 'dropdown',
+                            'label'       => __( 'Preferred Language', 'event-checkin' ),
+                            'options'     => array(
+                                array( 'label' => 'English',  'value' => 'en' ),
+                                array( 'label' => 'Greek',    'value' => 'el' ),
+                                array( 'label' => 'French',   'value' => 'fr' ),
+                                array( 'label' => 'German',   'value' => 'de' ),
+                                array( 'label' => 'Spanish',  'value' => 'es' ),
+                                array( 'label' => 'Turkish',  'value' => 'tr' ),
+                                array( 'label' => 'Polish',   'value' => 'pl' ),
+                                array( 'label' => 'Arabic',   'value' => 'ar' ),
+                            ),
+                            'required'    => false,
+                            'searchable'  => true,
+                            'width'       => 'half',
+                        ),
+                    ),
+                ),
+                // Step 2: Company Information.
+                array(
+                    'id'       => 'step_default_2',
+                    'title'    => __( 'Company Information', 'event-checkin' ),
+                    'subtitle' => __( 'Your organization details', 'event-checkin' ),
+                    'kicker'   => __( 'Organization', 'event-checkin' ),
+                    'fields'   => array(
+                        array(
+                            'id'          => 'field_company_name',
+                            'type'        => 'short_text',
+                            'label'       => __( 'Company / Organization Name', 'event-checkin' ),
+                            'placeholder' => __( 'Acme Inc.', 'event-checkin' ),
+                            'required'    => true,
+                            'maxlength'   => 255,
+                            'pattern'     => '',
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_company_type',
+                            'type'        => 'dropdown',
+                            'label'       => __( 'Company Type', 'event-checkin' ),
+                            'options'     => array(
+                                array( 'label' => __( 'Corporation', 'event-checkin' ),       'value' => 'corporation' ),
+                                array( 'label' => __( 'Startup', 'event-checkin' ),           'value' => 'startup' ),
+                                array( 'label' => __( 'SME', 'event-checkin' ),               'value' => 'sme' ),
+                                array( 'label' => __( 'NGO / Non-Profit', 'event-checkin' ),  'value' => 'ngo' ),
+                                array( 'label' => __( 'Government', 'event-checkin' ),        'value' => 'government' ),
+                                array( 'label' => __( 'Academic', 'event-checkin' ),          'value' => 'academic' ),
+                                array( 'label' => __( 'Freelancer', 'event-checkin' ),        'value' => 'freelancer' ),
+                                array( 'label' => __( 'Other', 'event-checkin' ),             'value' => 'other' ),
+                            ),
+                            'required'    => true,
+                            'searchable'  => false,
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_company_website',
+                            'type'        => 'website',
+                            'label'       => __( 'Website', 'event-checkin' ),
+                            'placeholder' => 'https://www.example.com',
+                            'required'    => false,
+                            'show_preview' => true,
+                            'width'       => 'full',
+                        ),
+                        array(
+                            'id'          => 'field_company_country',
+                            'type'        => 'country',
+                            'label'       => __( 'Company Country', 'event-checkin' ),
+                            'required'    => true,
+                            'searchable'  => true,
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_company_city',
+                            'type'        => 'short_text',
+                            'label'       => __( 'Company City', 'event-checkin' ),
+                            'placeholder' => '',
+                            'required'    => false,
+                            'maxlength'   => 200,
+                            'pattern'     => '',
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_company_address',
+                            'type'        => 'short_text',
+                            'label'       => __( 'Address', 'event-checkin' ),
+                            'placeholder' => '',
+                            'required'    => false,
+                            'maxlength'   => 500,
+                            'pattern'     => '',
+                            'width'       => 'full',
+                        ),
+                        array(
+                            'id'          => 'field_vat_tax_id',
+                            'type'        => 'short_text',
+                            'label'       => __( 'VAT / Tax ID', 'event-checkin' ),
+                            'placeholder' => '',
+                            'required'    => false,
+                            'maxlength'   => 50,
+                            'pattern'     => '',
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_company_email',
+                            'type'        => 'email',
+                            'label'       => __( 'Company Email', 'event-checkin' ),
+                            'placeholder' => 'info@company.com',
                             'required'    => false,
                             'verify'      => false,
                             'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_company_phone',
+                            'type'        => 'phone',
+                            'label'       => __( 'Company Phone', 'event-checkin' ),
+                            'placeholder' => '',
+                            'required'    => false,
+                            'verify'      => false,
+                            'country_codes' => array( '+30', '+33', '+44', '+49', '+1', '+48', '+90', '+34' ),
+                            'default_code'  => '+30',
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_company_description',
+                            'type'        => 'long_text',
+                            'label'       => __( 'Company Description', 'event-checkin' ),
+                            'placeholder' => __( 'Briefly describe your company...', 'event-checkin' ),
+                            'required'    => false,
+                            'maxlength'   => 2000,
+                            'rows'        => 4,
+                            'width'       => 'full',
+                        ),
+                        array(
+                            'id'          => 'field_company_logo',
+                            'type'        => 'file_upload',
+                            'label'       => __( 'Company Logo Upload', 'event-checkin' ),
+                            'required'    => false,
+                            'accept'      => '.jpg,.jpeg,.png,.svg,.webp',
+                            'max_size_mb' => 5,
+                            'multiple'    => false,
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_company_profile',
+                            'type'        => 'file_upload',
+                            'label'       => __( 'Company Profile Upload', 'event-checkin' ),
+                            'required'    => false,
+                            'accept'      => '.pdf,.doc,.docx,.ppt,.pptx',
+                            'max_size_mb' => 10,
+                            'multiple'    => false,
+                            'width'       => 'half',
+                        ),
+                    ),
+                ),
+                // Step 3: Professional & Preferences.
+                array(
+                    'id'       => 'step_default_3',
+                    'title'    => __( 'Professional & Preferences', 'event-checkin' ),
+                    'subtitle' => __( 'Your role and event preferences', 'event-checkin' ),
+                    'kicker'   => __( 'Preferences', 'event-checkin' ),
+                    'fields'   => array(
+                        array(
+                            'id'          => 'field_job_title',
+                            'type'        => 'short_text',
+                            'label'       => __( 'Job Title / Position', 'event-checkin' ),
+                            'placeholder' => __( 'e.g. Marketing Director', 'event-checkin' ),
+                            'required'    => false,
+                            'maxlength'   => 200,
+                            'pattern'     => '',
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_linkedin',
+                            'type'        => 'website',
+                            'label'       => __( 'LinkedIn Profile', 'event-checkin' ),
+                            'placeholder' => 'https://linkedin.com/in/yourprofile',
+                            'required'    => false,
+                            'show_preview' => false,
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_whatsapp',
+                            'type'        => 'phone',
+                            'label'       => __( 'WhatsApp Number', 'event-checkin' ),
+                            'placeholder' => '',
+                            'required'    => false,
+                            'verify'      => false,
+                            'country_codes' => array( '+30', '+33', '+44', '+49', '+1', '+48', '+90', '+34' ),
+                            'default_code'  => '+30',
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_dietary',
+                            'type'        => 'dropdown',
+                            'label'       => __( 'Dietary Restrictions', 'event-checkin' ),
+                            'options'     => array(
+                                array( 'label' => __( 'None', 'event-checkin' ),        'value' => 'none' ),
+                                array( 'label' => __( 'Vegetarian', 'event-checkin' ),  'value' => 'vegetarian' ),
+                                array( 'label' => __( 'Vegan', 'event-checkin' ),       'value' => 'vegan' ),
+                                array( 'label' => __( 'Gluten-free', 'event-checkin' ), 'value' => 'gluten_free' ),
+                                array( 'label' => __( 'Halal', 'event-checkin' ),       'value' => 'halal' ),
+                                array( 'label' => __( 'Kosher', 'event-checkin' ),      'value' => 'kosher' ),
+                                array( 'label' => __( 'Other', 'event-checkin' ),       'value' => 'other' ),
+                            ),
+                            'required'    => false,
+                            'searchable'  => false,
+                            'width'       => 'half',
+                        ),
+                        array(
+                            'id'          => 'field_accessibility',
+                            'type'        => 'long_text',
+                            'label'       => __( 'Accessibility Requirements', 'event-checkin' ),
+                            'placeholder' => __( 'Please describe any accessibility needs...', 'event-checkin' ),
+                            'required'    => false,
+                            'maxlength'   => 1000,
+                            'rows'        => 3,
+                            'width'       => 'full',
                         ),
                     ),
                 ),
             ),
             'settings' => array(
-                'submit_label'       => __( 'Submit Registration', 'event-checkin' ),
-                'success_message'    => __( 'Registration complete! Check your email for the QR code.', 'event-checkin' ),
-                'enable_review_step' => true,
+                'submit_label'        => __( 'Submit Registration', 'event-checkin' ),
+                'success_message'     => __( 'Registration complete! Check your email for the QR code.', 'event-checkin' ),
+                'enable_review_step'  => true,
                 'enable_progress_bar' => true,
+                'languages'           => array( 'en' ),
+                'deepl_api_key'       => '',
             ),
         );
     }
@@ -437,6 +704,17 @@ class Form_Fields {
                 }
                 break;
 
+            case 'country':
+                // Country codes are validated as 2-letter ISO codes.
+                if ( ! preg_match( '/^[A-Z]{2}$/', strtoupper( $value ) ) ) {
+                    return new \WP_Error( 'country', sprintf( __( '%s must be a valid country.', 'event-checkin' ), $label ) );
+                }
+                break;
+
+            case 'company_info':
+                // Company info card is read-only display, no validation needed.
+                break;
+
             case 'file_upload':
                 // File validation is handled separately during upload.
                 break;
@@ -477,6 +755,9 @@ class Form_Fields {
 
             case 'website':
                 return esc_url_raw( $value );
+
+            case 'country':
+                return strtoupper( sanitize_text_field( $value ) );
 
             case 'radio':
             case 'dropdown':

@@ -98,7 +98,24 @@ class Form_Renderer {
 
             <!-- Left Panel -->
             <aside class="ec-form-left">
-                <div class="ec-form-pill"><?php echo esc_html( $event->title ); ?></div>
+                <div class="ec-form-left-top">
+                    <div class="ec-form-pill"><?php echo esc_html( $event->title ); ?></div>
+                    <?php
+                    $form_languages = $settings['languages'] ?? array( 'en' );
+                    if ( count( $form_languages ) > 1 ) :
+                        $lang_labels = self::get_language_labels();
+                    ?>
+                    <div class="ec-form-lang-switcher" id="ec-form-lang-switcher">
+                        <select id="ec-form-language" class="ec-form-lang-select">
+                            <?php foreach ( $form_languages as $lang_code ) : ?>
+                                <option value="<?php echo esc_attr( $lang_code ); ?>">
+                                    <?php echo esc_html( $lang_labels[ $lang_code ] ?? strtoupper( $lang_code ) ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php endif; ?>
+                </div>
                 <div>
                     <h1 class="ec-form-headline">
                         <?php esc_html_e( 'Tell us about', 'event-checkin' ); ?><br>
@@ -521,6 +538,62 @@ class Form_Renderer {
                 <?php
                 break;
 
+            case 'country':
+                $countries = self::get_country_list();
+                ?>
+                <div class="ec-ff" data-width="<?php echo $width; ?>" data-field-id="<?php echo $id; ?>">
+                    <label class="ec-ff-label" for="<?php echo $id; ?>"><?php echo $label . $req_mark; ?></label>
+                    <select class="ec-ff-select ec-ff-country-select" id="<?php echo $id; ?>" name="<?php echo $name; ?>" <?php echo $required ? 'required' : ''; ?>>
+                        <option value=""><?php esc_html_e( '-- Select Country --', 'event-checkin' ); ?></option>
+                        <?php foreach ( $countries as $code => $country_name ) : ?>
+                            <option value="<?php echo esc_attr( $code ); ?>"><?php echo esc_html( $country_name ); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php
+                break;
+
+            case 'company_info':
+                ?>
+                <div class="ec-ff ec-ff-company-card" data-width="<?php echo $width; ?>" data-field-id="<?php echo $id; ?>">
+                    <div class="ec-company-card">
+                        <div class="ec-company-card-header">
+                            <?php if ( ! empty( $field['show_logo'] ) ) : ?>
+                            <div class="ec-company-card-logo" id="ec-company-logo-preview">
+                                <span class="ec-company-card-logo-placeholder">&#127970;</span>
+                            </div>
+                            <?php endif; ?>
+                            <div class="ec-company-card-title">
+                                <h4 id="ec-company-card-name"><?php esc_html_e( 'Company Name', 'event-checkin' ); ?></h4>
+                                <span class="ec-company-card-type" id="ec-company-card-type"><?php esc_html_e( 'Company Type', 'event-checkin' ); ?></span>
+                            </div>
+                        </div>
+                        <div class="ec-company-card-body">
+                            <div class="ec-company-card-row">
+                                <span class="ec-company-card-icon">&#127760;</span>
+                                <span id="ec-company-card-website">&mdash;</span>
+                            </div>
+                            <div class="ec-company-card-row">
+                                <span class="ec-company-card-icon">&#128205;</span>
+                                <span id="ec-company-card-location">&mdash;</span>
+                            </div>
+                            <div class="ec-company-card-row">
+                                <span class="ec-company-card-icon">@</span>
+                                <span id="ec-company-card-email">&mdash;</span>
+                            </div>
+                            <div class="ec-company-card-row">
+                                <span class="ec-company-card-icon">&#9742;</span>
+                                <span id="ec-company-card-phone">&mdash;</span>
+                            </div>
+                            <?php if ( ! empty( $field['show_desc'] ) ) : ?>
+                            <div class="ec-company-card-desc" id="ec-company-card-desc"></div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php
+                break;
+
             case 'hidden':
                 ?>
                 <input type="hidden" name="<?php echo esc_attr( $field['name'] ?? $name ); ?>" value="<?php echo esc_attr( $field['value'] ?? '' ); ?>">
@@ -542,5 +615,69 @@ class Form_Renderer {
         }
 
         return ob_get_clean();
+    }
+
+    /**
+     * Get list of countries (ISO 3166-1 alpha-2).
+     *
+     * @return array Associative array of code => name.
+     */
+    public static function get_country_list() {
+        $list = array(
+            'AF' => 'Afghanistan', 'AL' => 'Albania', 'DZ' => 'Algeria', 'AD' => 'Andorra',
+            'AO' => 'Angola', 'AR' => 'Argentina', 'AM' => 'Armenia', 'AU' => 'Australia',
+            'AT' => 'Austria', 'AZ' => 'Azerbaijan', 'BH' => 'Bahrain', 'BD' => 'Bangladesh',
+            'BY' => 'Belarus', 'BE' => 'Belgium', 'BA' => 'Bosnia and Herzegovina',
+            'BR' => 'Brazil', 'BG' => 'Bulgaria', 'CA' => 'Canada', 'CL' => 'Chile',
+            'CN' => 'China', 'CO' => 'Colombia', 'HR' => 'Croatia', 'CU' => 'Cuba',
+            'CY' => 'Cyprus', 'CZ' => 'Czech Republic', 'DK' => 'Denmark', 'EC' => 'Ecuador',
+            'EG' => 'Egypt', 'EE' => 'Estonia', 'ET' => 'Ethiopia', 'FI' => 'Finland',
+            'FR' => 'France', 'GE' => 'Georgia', 'DE' => 'Germany', 'GH' => 'Ghana',
+            'GR' => 'Greece', 'GT' => 'Guatemala', 'HU' => 'Hungary', 'IS' => 'Iceland',
+            'IN' => 'India', 'ID' => 'Indonesia', 'IR' => 'Iran', 'IQ' => 'Iraq',
+            'IE' => 'Ireland', 'IL' => 'Israel', 'IT' => 'Italy', 'JM' => 'Jamaica',
+            'JP' => 'Japan', 'JO' => 'Jordan', 'KZ' => 'Kazakhstan', 'KE' => 'Kenya',
+            'KW' => 'Kuwait', 'LV' => 'Latvia', 'LB' => 'Lebanon', 'LY' => 'Libya',
+            'LT' => 'Lithuania', 'LU' => 'Luxembourg', 'MK' => 'North Macedonia',
+            'MY' => 'Malaysia', 'MT' => 'Malta', 'MX' => 'Mexico', 'MD' => 'Moldova',
+            'MC' => 'Monaco', 'ME' => 'Montenegro', 'MA' => 'Morocco', 'NL' => 'Netherlands',
+            'NZ' => 'New Zealand', 'NG' => 'Nigeria', 'NO' => 'Norway', 'OM' => 'Oman',
+            'PK' => 'Pakistan', 'PA' => 'Panama', 'PE' => 'Peru', 'PH' => 'Philippines',
+            'PL' => 'Poland', 'PT' => 'Portugal', 'QA' => 'Qatar', 'RO' => 'Romania',
+            'RU' => 'Russia', 'SA' => 'Saudi Arabia', 'RS' => 'Serbia', 'SG' => 'Singapore',
+            'SK' => 'Slovakia', 'SI' => 'Slovenia', 'ZA' => 'South Africa',
+            'KR' => 'South Korea', 'ES' => 'Spain', 'SE' => 'Sweden', 'CH' => 'Switzerland',
+            'TW' => 'Taiwan', 'TH' => 'Thailand', 'TN' => 'Tunisia', 'TR' => 'Turkey',
+            'UA' => 'Ukraine', 'AE' => 'United Arab Emirates', 'GB' => 'United Kingdom',
+            'US' => 'United States', 'UY' => 'Uruguay', 'UZ' => 'Uzbekistan',
+            'VE' => 'Venezuela', 'VN' => 'Vietnam',
+        );
+        asort( $list );
+        return apply_filters( 'ec_country_list', $list );
+    }
+
+    /**
+     * Get language labels for the language switcher.
+     *
+     * @return array Language code => label.
+     */
+    public static function get_language_labels() {
+        return array(
+            'en' => 'English',
+            'el' => 'Greek',
+            'fr' => 'French',
+            'de' => 'German',
+            'es' => 'Spanish',
+            'tr' => 'Turkish',
+            'pl' => 'Polish',
+            'ar' => 'Arabic',
+            'it' => 'Italian',
+            'pt' => 'Portuguese',
+            'nl' => 'Dutch',
+            'ru' => 'Russian',
+            'ja' => 'Japanese',
+            'zh' => 'Chinese',
+            'ko' => 'Korean',
+        );
     }
 }

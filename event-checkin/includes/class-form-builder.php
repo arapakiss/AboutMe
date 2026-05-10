@@ -132,6 +132,13 @@ class Form_Builder {
                     </select>
                 </div>
                 <div class="ec-builder-topbar-right">
+                    <button type="button" class="ec-builder-btn ec-builder-btn--ghost" id="ec-import-form" title="<?php esc_attr_e( 'Import form schema from JSON', 'event-checkin' ); ?>">
+                        &#8593; <?php esc_html_e( 'Import', 'event-checkin' ); ?>
+                    </button>
+                    <input type="file" id="ec-import-file" accept=".json" style="display:none">
+                    <button type="button" class="ec-builder-btn ec-builder-btn--ghost" id="ec-export-form" title="<?php esc_attr_e( 'Export form schema as JSON', 'event-checkin' ); ?>">
+                        &#8595; <?php esc_html_e( 'Export', 'event-checkin' ); ?>
+                    </button>
                     <button type="button" class="ec-builder-btn ec-builder-btn--ghost" id="ec-create-page">
                         <?php esc_html_e( 'Create Registration Page', 'event-checkin' ); ?>
                     </button>
@@ -185,6 +192,38 @@ class Form_Builder {
                     </div>
                     <div class="ec-settings-body" id="ec-settings-body">
                         <p class="ec-settings-empty"><?php esc_html_e( 'Click a field to edit its settings.', 'event-checkin' ); ?></p>
+                    </div>
+
+                    <!-- Translation Settings -->
+                    <div class="ec-settings-section ec-translation-settings">
+                        <div class="ec-settings-header">
+                            <h3><?php esc_html_e( 'Translation (DeepL)', 'event-checkin' ); ?></h3>
+                        </div>
+                        <div class="ec-settings-body">
+                            <div class="ec-setting-group">
+                                <label class="ec-setting-label"><?php esc_html_e( 'DeepL API Key (Free)', 'event-checkin' ); ?></label>
+                                <input class="ec-setting-input" type="password" id="ec-deepl-api-key" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx">
+                                <button type="button" class="ec-builder-btn ec-builder-btn--ghost ec-btn-full" id="ec-deepl-test" style="margin-top:6px">
+                                    <?php esc_html_e( 'Test Key', 'event-checkin' ); ?>
+                                </button>
+                            </div>
+                            <div class="ec-setting-group">
+                                <label class="ec-setting-label"><?php esc_html_e( 'Form Languages', 'event-checkin' ); ?></label>
+                                <?php
+                                $all_langs = Form_Renderer::get_language_labels();
+                                foreach ( $all_langs as $code => $name ) :
+                                ?>
+                                <label class="ec-setting-checkbox" style="margin-bottom:4px">
+                                    <input type="checkbox" class="ec-lang-checkbox" value="<?php echo esc_attr( $code ); ?>" <?php echo $code === 'en' ? 'checked disabled' : ''; ?>>
+                                    <?php echo esc_html( $name ); ?>
+                                </label>
+                                <?php endforeach; ?>
+                            </div>
+                            <button type="button" class="ec-builder-btn ec-builder-btn--primary ec-btn-full" id="ec-deepl-translate" style="margin-top:8px">
+                                <?php esc_html_e( 'Generate Translations', 'event-checkin' ); ?>
+                            </button>
+                            <div id="ec-deepl-status" style="margin-top:8px;font-size:12px;color:var(--ecb-muted)"></div>
+                        </div>
                     </div>
                 </aside>
             </div>
@@ -344,6 +383,14 @@ class Form_Builder {
      * @return array Sanitized schema.
      */
     private static function sanitize_schema( $schema ) {
+        $languages = array( 'en' );
+        if ( ! empty( $schema['settings']['languages'] ) && is_array( $schema['settings']['languages'] ) ) {
+            $languages = array_map( 'sanitize_text_field', $schema['settings']['languages'] );
+            if ( ! in_array( 'en', $languages, true ) ) {
+                array_unshift( $languages, 'en' );
+            }
+        }
+
         $clean = array(
             'steps'    => array(),
             'settings' => array(
@@ -351,6 +398,8 @@ class Form_Builder {
                 'success_message'     => sanitize_textarea_field( $schema['settings']['success_message'] ?? '' ),
                 'enable_review_step'  => ! empty( $schema['settings']['enable_review_step'] ),
                 'enable_progress_bar' => ! empty( $schema['settings']['enable_progress_bar'] ),
+                'languages'           => $languages,
+                'deepl_api_key'       => sanitize_text_field( $schema['settings']['deepl_api_key'] ?? '' ),
             ),
         );
 

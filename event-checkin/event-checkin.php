@@ -72,6 +72,7 @@ require_once EC_PLUGIN_DIR . 'includes/class-settings.php';
 require_once EC_PLUGIN_DIR . 'includes/class-form-fields.php';
 require_once EC_PLUGIN_DIR . 'includes/class-form-builder.php';
 require_once EC_PLUGIN_DIR . 'includes/class-form-renderer.php';
+require_once EC_PLUGIN_DIR . 'includes/class-deepl-translate.php';
 require_once EC_PLUGIN_DIR . 'includes/class-verification.php';
 
 add_action( 'plugins_loaded', function () {
@@ -86,5 +87,6 @@ add_action( 'plugins_loaded', function () {
     EventCheckin\Checkin::init();
     EventCheckin\Form_Builder::init();
     EventCheckin\Form_Renderer::init();
+    EventCheckin\DeepL_Translate::init();
     EventCheckin\Verification::init();
 });

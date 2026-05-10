@@ -1,0 +1,303 @@
+{
+  "steps": [
+    {
+      "id": "step_personal",
+      "title": "Personal Details",
+      "subtitle": "Tell us about yourself",
+      "kicker": "Registration",
+      "fields": [
+        {
+          "id": "field_first_name",
+          "type": "short_text",
+          "label": "First Name",
+          "placeholder": "John",
+          "required": true,
+          "maxlength": 100,
+          "pattern": "",
+          "width": "half"
+        },
+        {
+          "id": "field_last_name",
+          "type": "short_text",
+          "label": "Last Name",
+          "placeholder": "Doe",
+          "required": true,
+          "maxlength": 100,
+          "pattern": "",
+          "width": "half"
+        },
+        {
+          "id": "field_email",
+          "type": "email",
+          "label": "Email",
+          "placeholder": "name@example.com",
+          "required": true,
+          "verify": false,
+          "width": "half"
+        },
+        {
+          "id": "field_mobile_phone",
+          "type": "phone",
+          "label": "Mobile Phone",
+          "placeholder": "",
+          "required": true,
+          "verify": false,
+          "country_codes": ["+30", "+33", "+44", "+49", "+1", "+48", "+90", "+34"],
+          "default_code": "+30",
+          "width": "half"
+        },
+        {
+          "id": "field_country",
+          "type": "country",
+          "label": "Country",
+          "required": true,
+          "searchable": true,
+          "width": "half"
+        },
+        {
+          "id": "field_city",
+          "type": "short_text",
+          "label": "City",
+          "placeholder": "",
+          "required": false,
+          "maxlength": 200,
+          "pattern": "",
+          "width": "half"
+        },
+        {
+          "id": "field_preferred_language",
+          "type": "dropdown",
+          "label": "Preferred Language",
+          "options": [
+            { "label": "English", "value": "en", "description": "" },
+            { "label": "Greek", "value": "el", "description": "" },
+            { "label": "French", "value": "fr", "description": "" },
+            { "label": "German", "value": "de", "description": "" },
+            { "label": "Spanish", "value": "es", "description": "" },
+            { "label": "Turkish", "value": "tr", "description": "" },
+            { "label": "Polish", "value": "pl", "description": "" },
+            { "label": "Arabic", "value": "ar", "description": "" }
+          ],
+          "required": false,
+          "searchable": true,
+          "width": "half"
+        }
+      ]
+    },
+    {
+      "id": "step_company",
+      "title": "Company Information",
+      "subtitle": "Your organization details",
+      "kicker": "Organization",
+      "fields": [
+        {
+          "id": "field_company_name",
+          "type": "short_text",
+          "label": "Company / Organization Name",
+          "placeholder": "Acme Inc.",
+          "required": true,
+          "maxlength": 255,
+          "pattern": "",
+          "width": "half"
+        },
+        {
+          "id": "field_company_type",
+          "type": "dropdown",
+          "label": "Company Type",
+          "options": [
+            { "label": "Corporation", "value": "corporation", "description": "" },
+            { "label": "Startup", "value": "startup", "description": "" },
+            { "label": "SME", "value": "sme", "description": "" },
+            { "label": "NGO / Non-Profit", "value": "ngo", "description": "" },
+            { "label": "Government", "value": "government", "description": "" },
+            { "label": "Academic", "value": "academic", "description": "" },
+            { "label": "Freelancer", "value": "freelancer", "description": "" },
+            { "label": "Other", "value": "other", "description": "" }
+          ],
+          "required": true,
+          "searchable": false,
+          "width": "half"
+        },
+        {
+          "id": "field_company_website",
+          "type": "website",
+          "label": "Website",
+          "placeholder": "https://www.example.com",
+          "required": false,
+          "show_preview": true,
+          "width": "full"
+        },
+        {
+          "id": "field_company_country",
+          "type": "country",
+          "label": "Company Country",
+          "required": true,
+          "searchable": true,
+          "width": "half"
+        },
+        {
+          "id": "field_company_city",
+          "type": "short_text",
+          "label": "Company City",
+          "placeholder": "",
+          "required": false,
+          "maxlength": 200,
+          "pattern": "",
+          "width": "half"
+        },
+        {
+          "id": "field_company_address",
+          "type": "short_text",
+          "label": "Address",
+          "placeholder": "",
+          "required": false,
+          "maxlength": 500,
+          "pattern": "",
+          "width": "full"
+        },
+        {
+          "id": "field_vat_tax_id",
+          "type": "short_text",
+          "label": "VAT / Tax ID",
+          "placeholder": "",
+          "required": false,
+          "maxlength": 50,
+          "pattern": "",
+          "width": "half"
+        },
+        {
+          "id": "field_company_email",
+          "type": "email",
+          "label": "Company Email",
+          "placeholder": "info@company.com",
+          "required": false,
+          "verify": false,
+          "width": "half"
+        },
+        {
+          "id": "field_company_phone",
+          "type": "phone",
+          "label": "Company Phone",
+          "placeholder": "",
+          "required": false,
+          "verify": false,
+          "country_codes": ["+30", "+33", "+44", "+49", "+1", "+48", "+90", "+34"],
+          "default_code": "+30",
+          "width": "half"
+        },
+        {
+          "id": "field_company_description",
+          "type": "long_text",
+          "label": "Company Description",
+          "placeholder": "Briefly describe your company...",
+          "required": false,
+          "maxlength": 2000,
+          "rows": 4,
+          "width": "full"
+        },
+        {
+          "id": "field_company_logo",
+          "type": "file_upload",
+          "label": "Company Logo Upload",
+          "required": false,
+          "accept": ".jpg,.jpeg,.png,.svg,.webp",
+          "max_size_mb": 5,
+          "multiple": false,
+          "width": "half"
+        },
+        {
+          "id": "field_company_profile",
+          "type": "file_upload",
+          "label": "Company Profile Upload",
+          "required": false,
+          "accept": ".pdf,.doc,.docx,.ppt,.pptx",
+          "max_size_mb": 10,
+          "multiple": false,
+          "width": "half"
+        },
+        {
+          "id": "field_company_card",
+          "type": "company_info",
+          "label": "Company Information",
+          "required": false,
+          "show_logo": true,
+          "show_desc": true,
+          "show_social": true,
+          "width": "full"
+        }
+      ]
+    },
+    {
+      "id": "step_professional",
+      "title": "Professional & Preferences",
+      "subtitle": "Your role and event preferences",
+      "kicker": "Preferences",
+      "fields": [
+        {
+          "id": "field_job_title",
+          "type": "short_text",
+          "label": "Job Title / Position",
+          "placeholder": "e.g. Marketing Director",
+          "required": false,
+          "maxlength": 200,
+          "pattern": "",
+          "width": "half"
+        },
+        {
+          "id": "field_linkedin",
+          "type": "website",
+          "label": "LinkedIn Profile",
+          "placeholder": "https://linkedin.com/in/yourprofile",
+          "required": false,
+          "show_preview": false,
+          "width": "half"
+        },
+        {
+          "id": "field_whatsapp",
+          "type": "phone",
+          "label": "WhatsApp Number",
+          "placeholder": "",
+          "required": false,
+          "verify": false,
+          "country_codes": ["+30", "+33", "+44", "+49", "+1", "+48", "+90", "+34"],
+          "default_code": "+30",
+          "width": "half"
+        },
+        {
+          "id": "field_dietary",
+          "type": "dropdown",
+          "label": "Dietary Restrictions",
+          "options": [
+            { "label": "None", "value": "none", "description": "" },
+            { "label": "Vegetarian", "value": "vegetarian", "description": "" },
+            { "label": "Vegan", "value": "vegan", "description": "" },
+            { "label": "Gluten-free", "value": "gluten_free", "description": "" },
+            { "label": "Halal", "value": "halal", "description": "" },
+            { "label": "Kosher", "value": "kosher", "description": "" },
+            { "label": "Other", "value": "other", "description": "" }
+          ],
+          "required": false,
+          "searchable": false,
+          "width": "half"
+        },
+        {
+          "id": "field_accessibility",
+          "type": "long_text",
+          "label": "Accessibility Requirements",
+          "placeholder": "Please describe any accessibility needs...",
+          "required": false,
+          "maxlength": 1000,
+          "rows": 3,
+          "width": "full"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "submit_label": "Submit Registration",
+    "success_message": "Registration complete! Check your email for the QR code.",
+    "enable_review_step": true,
+    "enable_progress_bar": true,
+    "languages": ["en"]
+  }
+}

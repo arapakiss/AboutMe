@@ -55,6 +55,9 @@
                     sort: false,
                     draggable: '.ec-palette-field',
                     ghostClass: 'sortable-ghost',
+                    forceFallback: true,
+                    fallbackClass: 'sortable-fallback',
+                    fallbackOnBody: true,
                     onEnd: function() {}
                 });
             });
@@ -292,6 +295,9 @@
                 group: { name: 'fields', pull: true, put: true },
                 animation: 200,
                 ghostClass: 'sortable-ghost',
+                forceFallback: true,
+                fallbackClass: 'sortable-fallback',
+                fallbackOnBody: true,
                 draggable: '.ec-canvas-field',
                 onAdd: function(evt) {
                     // Field added from palette.

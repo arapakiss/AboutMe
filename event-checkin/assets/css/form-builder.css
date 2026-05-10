@@ -196,6 +196,11 @@
     font-size: 12px;
     font-weight: 600;
     color: var(--ecb-navy);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
 .ec-palette-field:hover {
@@ -689,6 +694,28 @@
     font-weight: 600;
     color: var(--ecb-navy);
     cursor: pointer;
+}
+
+/* Sortable fallback element (used in Firefox) */
+.sortable-fallback {
+    opacity: 0.85 !important;
+    box-shadow: 0 12px 36px rgba(0, 45, 114, 0.2) !important;
+    transform: rotate(2deg);
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background: var(--ecb-cyan) !important;
+}
+
+/* Prevent text selection on draggable areas */
+.ec-canvas-field,
+.ec-canvas-fields,
+.ec-palette-category-items {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 /* Palette category items container (for proper Sortable nesting) */

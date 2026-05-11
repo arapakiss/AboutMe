@@ -769,14 +769,14 @@
                     return;
                 }
                 $btn.text('Translating...');
-                self.doTranslateRequest(apiKey, languages, $btn);
+                self.doTranslateRequest(provider, apiKey, languages, $btn);
             }).fail(function() {
                 $btn.text('Generate Translations').prop('disabled', false);
                 $('#ec-deepl-status').text('Save request failed.').css('color', '#dc2626');
             });
         },
 
-        doTranslateRequest: function(apiKey, languages, $btn) {
+        doTranslateRequest: function(provider, apiKey, languages, $btn) {
             var self = this;
             $.post(ecFormBuilder.ajaxUrl, {
                 action: 'ec_deepl_translate_form',

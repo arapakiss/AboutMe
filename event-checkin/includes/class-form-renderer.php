@@ -103,6 +103,80 @@ class Form_Renderer {
         unset( $frontend_schema['settings']['deepl_api_key'] );
 
         ob_start();
+
+        // Inject inline CSS immediately for hiding header/footer/title.
+        // This fires before JS and works regardless of theme selector names.
+        if ( $hide_header || $hide_footer || $hide_title ) :
+        ?>
+        <style id="ec-layout-overrides">
+            <?php if ( $hide_header ) : ?>
+            /* Hide theme header - broad selectors covering most themes */
+            header,
+            .site-header,
+            #masthead,
+            .header,
+            #header,
+            .wp-site-header,
+            [role="banner"],
+            .elementor-location-header,
+            [data-elementor-type="header"],
+            .ehf-header,
+            #ehf-header,
+            .ast-above-header,
+            .ast-main-header-wrap,
+            .ast-below-header,
+            .site-header-wrapper,
+            #site-header,
+            .kadence-header,
+            .neve-header,
+            .wp-block-template-part[data-area="header"],
+            #flavor-header { display: none !important; }
+            html { margin-top: 0 !important; }
+            #wpadminbar { display: none !important; }
+            <?php endif; ?>
+            <?php if ( $hide_footer ) : ?>
+            /* Hide theme footer */
+            footer,
+            .site-footer,
+            #colophon,
+            .footer,
+            #footer,
+            .wp-site-footer,
+            [role="contentinfo"],
+            .elementor-location-footer,
+            [data-elementor-type="footer"],
+            .ehf-footer,
+            #ehf-footer,
+            .ast-footer-overlay,
+            .site-footer-wrapper,
+            #site-footer,
+            .kadence-footer,
+            .neve-footer,
+            .wp-block-template-part[data-area="footer"],
+            #flavor-footer { display: none !important; }
+            <?php endif; ?>
+            <?php if ( $hide_title ) : ?>
+            /* Hide page title */
+            .entry-title,
+            .page-title,
+            .post-title,
+            .entry-header,
+            .page-header,
+            .elementor-page-title,
+            .elementor-widget-theme-page-title,
+            [data-widget_type="theme-page-title.default"],
+            .ast-the-title,
+            .hentry .entry-title,
+            .wp-block-post-title,
+            #page-title-wrapper { display: none !important; }
+            <?php endif; ?>
+            <?php if ( $hide_header || $hide_footer ) : ?>
+            /* Make form fill viewport */
+            .ec-form-app { min-height: 100vh; }
+            <?php endif; ?>
+        </style>
+        <?php
+        endif;
         ?>
         <div class="ec-form-app" id="ec-form-app"
              data-event-id="<?php echo intval( $event_id ); ?>"

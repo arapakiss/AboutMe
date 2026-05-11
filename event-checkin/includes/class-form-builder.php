@@ -257,6 +257,15 @@ class Form_Builder {
                             <button type="button" class="ec-builder-btn ec-builder-btn--primary ec-btn-full" id="ec-deepl-translate" style="margin-top:8px">
                                 <?php esc_html_e( 'Generate Translations', 'event-checkin' ); ?>
                             </button>
+                            <div id="ec-translate-progress" style="display:none;margin-top:10px">
+                                <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--ecb-navy);margin-bottom:4px">
+                                    <span id="ec-translate-progress-label"><?php esc_html_e( 'Translating...', 'event-checkin' ); ?></span>
+                                    <span id="ec-translate-progress-pct">0%</span>
+                                </div>
+                                <div style="height:6px;background:var(--ecb-line);overflow:hidden">
+                                    <div id="ec-translate-progress-bar" style="height:100%;width:0%;background:var(--ecb-cyan);transition:width 0.3s ease"></div>
+                                </div>
+                            </div>
                             <div id="ec-deepl-status" style="margin-top:8px;font-size:12px;color:var(--ecb-muted)"></div>
                         </div>
                     </div>

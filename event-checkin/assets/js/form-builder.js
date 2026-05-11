@@ -778,29 +778,84 @@
 
         doTranslateRequest: function(provider, apiKey, languages, $btn) {
             var self = this;
-            $.post(ecFormBuilder.ajaxUrl, {
-                action: 'ec_deepl_translate_form',
-                nonce: ecFormBuilder.nonce,
-                event_id: this.eventId,
-                provider: provider,
-                api_key: apiKey,
-                languages: languages
-            }, function(res) {
-                $btn.text('Generate Translations').prop('disabled', false);
-                if (res.success) {
-                    var msg = res.data.message || 'Done';
-                    if (res.data.warnings && res.data.warnings.length) {
-                        msg += ' (warnings: ' + res.data.warnings.join(', ') + ')';
+            // Translate one language at a time to show real progress.
+            var targetLangs = languages.filter(function(l) { return l !== 'en'; });
+            var total = targetLangs.length;
+            var completed = 0;
+            var warnings = [];
+
+            // Language labels for display.
+            var langNames = {
+                en: 'English', el: 'Greek', fr: 'French', de: 'German',
+                es: 'Spanish', tr: 'Turkish', pl: 'Polish', ar: 'Arabic',
+                it: 'Italian', pt: 'Portuguese', nl: 'Dutch', ru: 'Russian',
+                ja: 'Japanese', zh: 'Chinese', ko: 'Korean'
+            };
+
+            // Show progress bar.
+            var $progress = $('#ec-translate-progress');
+            var $bar = $('#ec-translate-progress-bar');
+            var $label = $('#ec-translate-progress-label');
+            var $pct = $('#ec-translate-progress-pct');
+            $progress.show();
+            $bar.css('width', '0%');
+            $label.text('Starting...');
+            $pct.text('0%');
+            $('#ec-deepl-status').text('');
+
+            function translateNext(index) {
+                if (index >= total) {
+                    // All done.
+                    $bar.css('width', '100%');
+                    $pct.text('100%');
+                    $label.text('Complete!');
+                    $btn.text('Generate Translations').prop('disabled', false);
+
+                    var msg = 'Translated into ' + total + ' language(s).';
+                    if (warnings.length) {
+                        msg += ' Warnings: ' + warnings.join('; ');
                     }
                     $('#ec-deepl-status').text(msg).css('color', '#16a34a');
                     self.showToast('Translations generated!');
-                } else {
-                    $('#ec-deepl-status').text(res.data.message || 'Error').css('color', '#dc2626');
+
+                    // Hide progress bar after a moment.
+                    setTimeout(function() { $progress.fadeOut(); }, 3000);
+                    return;
                 }
-            }).fail(function() {
-                $btn.text('Generate Translations').prop('disabled', false);
-                $('#ec-deepl-status').text('Request failed.').css('color', '#dc2626');
-            });
+
+                var lang = targetLangs[index];
+                var langName = langNames[lang] || lang.toUpperCase();
+                var pctVal = Math.round(((index) / total) * 100);
+                $bar.css('width', pctVal + '%');
+                $pct.text(pctVal + '%');
+                $label.text('Translating ' + langName + '... (' + (index + 1) + '/' + total + ')');
+                $btn.text('Translating ' + langName + '...');
+
+                $.post(ecFormBuilder.ajaxUrl, {
+                    action: 'ec_deepl_translate_form',
+                    nonce: ecFormBuilder.nonce,
+                    event_id: self.eventId,
+                    provider: provider,
+                    api_key: apiKey,
+                    languages: ['en', lang]
+                }, function(res) {
+                    completed++;
+                    if (res.success) {
+                        if (res.data.warnings && res.data.warnings.length) {
+                            warnings = warnings.concat(res.data.warnings);
+                        }
+                    } else {
+                        warnings.push(langName + ': ' + (res.data.message || 'failed'));
+                    }
+                    translateNext(index + 1);
+                }).fail(function() {
+                    completed++;
+                    warnings.push(langName + ': request failed');
+                    translateNext(index + 1);
+                });
+            }
+
+            translateNext(0);
         },
 
         // ── Import / Export ──

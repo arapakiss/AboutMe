@@ -16,20 +16,21 @@ class Settings {
      * Default settings.
      */
     private static $defaults = array(
-        'recaptcha_enabled'    => false,
-        'recaptcha_site_key'   => '',
-        'recaptcha_secret_key' => '',
-        'recaptcha_threshold'  => 0.5,
-        'object_cache_ttl'     => 300,  // 5 minutes.
-        'kiosk_idle_timeout'   => 15,   // seconds.
-        'email_from_name'      => '',
-        'email_from_address'   => '',
-        'export_chunk_size'    => 500,  // rows per batch for background export.
-        'sms_provider'         => '',   // 'twilio' or 'webhook'.
-        'sms_webhook_url'      => '',
-        'twilio_account_sid'   => '',
-        'twilio_auth_token'    => '',
-        'twilio_from_number'   => '',
+        'recaptcha_enabled'        => false,
+        'recaptcha_site_key'       => '',
+        'recaptcha_secret_key'     => '',
+        'recaptcha_threshold'      => 0.5,
+        'object_cache_ttl'         => 300,  // 5 minutes.
+        'kiosk_idle_timeout'       => 15,   // seconds.
+        'email_from_name'          => '',
+        'email_from_address'       => '',
+        'export_chunk_size'        => 500,  // rows per batch for background export.
+        'sms_provider'             => '',   // 'twilio' or 'webhook'.
+        'sms_webhook_url'          => '',
+        'twilio_account_sid'       => '',
+        'twilio_auth_token'        => '',
+        'twilio_from_number'       => '',
+        'delete_data_on_uninstall' => false, // Keep data by default on uninstall/update.
     );
 
     /**
@@ -209,20 +210,21 @@ class Settings {
         check_admin_referer( 'ec_save_settings', 'ec_nonce' );
 
         self::save( array(
-            'recaptcha_enabled'    => ! empty( $_POST['recaptcha_enabled'] ),
-            'recaptcha_site_key'   => $_POST['recaptcha_site_key'] ?? '',
-            'recaptcha_secret_key' => $_POST['recaptcha_secret_key'] ?? '',
-            'recaptcha_threshold'  => $_POST['recaptcha_threshold'] ?? 0.5,
-            'object_cache_ttl'     => $_POST['object_cache_ttl'] ?? 300,
-            'kiosk_idle_timeout'   => $_POST['kiosk_idle_timeout'] ?? 15,
-            'email_from_name'      => $_POST['email_from_name'] ?? '',
-            'email_from_address'   => $_POST['email_from_address'] ?? '',
-            'export_chunk_size'    => $_POST['export_chunk_size'] ?? 500,
-            'sms_provider'         => $_POST['sms_provider'] ?? '',
-            'sms_webhook_url'      => $_POST['sms_webhook_url'] ?? '',
-            'twilio_account_sid'   => $_POST['twilio_account_sid'] ?? '',
-            'twilio_auth_token'    => $_POST['twilio_auth_token'] ?? '',
-            'twilio_from_number'   => $_POST['twilio_from_number'] ?? '',
+            'recaptcha_enabled'        => ! empty( $_POST['recaptcha_enabled'] ),
+            'recaptcha_site_key'       => $_POST['recaptcha_site_key'] ?? '',
+            'recaptcha_secret_key'     => $_POST['recaptcha_secret_key'] ?? '',
+            'recaptcha_threshold'      => $_POST['recaptcha_threshold'] ?? 0.5,
+            'object_cache_ttl'         => $_POST['object_cache_ttl'] ?? 300,
+            'kiosk_idle_timeout'       => $_POST['kiosk_idle_timeout'] ?? 15,
+            'email_from_name'          => $_POST['email_from_name'] ?? '',
+            'email_from_address'       => $_POST['email_from_address'] ?? '',
+            'export_chunk_size'        => $_POST['export_chunk_size'] ?? 500,
+            'sms_provider'             => $_POST['sms_provider'] ?? '',
+            'sms_webhook_url'          => $_POST['sms_webhook_url'] ?? '',
+            'twilio_account_sid'       => $_POST['twilio_account_sid'] ?? '',
+            'twilio_auth_token'        => $_POST['twilio_auth_token'] ?? '',
+            'twilio_from_number'       => $_POST['twilio_from_number'] ?? '',
+            'delete_data_on_uninstall' => ! empty( $_POST['delete_data_on_uninstall'] ),
         ) );
 
         wp_safe_redirect( admin_url( 'admin.php?page=ec-settings&updated=1' ) );

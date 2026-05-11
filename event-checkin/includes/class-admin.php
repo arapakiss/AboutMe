@@ -775,6 +775,23 @@ class Admin {
                     </tr>
                 </table>
 
+                <!-- Data Retention Section -->
+                <h2><?php esc_html_e( 'Data Retention', 'event-checkin' ); ?></h2>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="delete_data_on_uninstall"><?php esc_html_e( 'Delete Data on Uninstall', 'event-checkin' ); ?></label></th>
+                        <td>
+                            <label>
+                                <input type="checkbox" id="delete_data_on_uninstall" name="delete_data_on_uninstall" value="1" <?php checked( $settings['delete_data_on_uninstall'] ); ?>>
+                                <?php esc_html_e( 'Delete all plugin data (events, registrations, QR codes, translations) when the plugin is uninstalled', 'event-checkin' ); ?>
+                            </label>
+                            <p class="description" style="color: #b91c1c;">
+                                <?php esc_html_e( 'Leave unchecked to preserve your data during updates and reinstalls. Only enable this if you want a complete cleanup when deleting the plugin.', 'event-checkin' ); ?>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+
                 <?php submit_button(); ?>
             </form>
         </div>

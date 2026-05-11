@@ -13,8 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class DeepL_Translate {
 
-    const API_URL = 'https://api-free.deepl.com/v2/translate';
-    const LANGS_URL = 'https://api-free.deepl.com/v2/languages';
+    const DEEPL_API_URL = 'https://api-free.deepl.com/v2/translate';
+    const DEEPL_LANGS_URL = 'https://api-free.deepl.com/v2/languages';
+    const MYMEMORY_API_URL = 'https://api.mymemory.translated.net/get';
     const CACHE_PREFIX = 'ec_deepl_';
 
     /**
@@ -60,10 +61,16 @@ class DeepL_Translate {
 
         $event_id  = absint( $_POST['event_id'] ?? 0 );
         $api_key   = sanitize_text_field( $_POST['api_key'] ?? '' );
+        $provider  = sanitize_text_field( $_POST['provider'] ?? 'deepl' );
         $languages = isset( $_POST['languages'] ) ? array_map( 'sanitize_text_field', (array) $_POST['languages'] ) : array();
 
-        if ( ! $event_id || empty( $api_key ) || empty( $languages ) ) {
+        if ( ! $event_id || empty( $languages ) ) {
             wp_send_json_error( array( 'message' => 'Missing required parameters.' ) );
+        }
+
+        // DeepL requires an API key; MyMemory does not.
+        if ( $provider === 'deepl' && empty( $api_key ) ) {
+            wp_send_json_error( array( 'message' => 'DeepL requires an API key.' ) );
         }
 
         // Load form schema.
@@ -106,7 +113,9 @@ class DeepL_Translate {
                 continue;
             }
 
-            $result = self::translate_batch( $strings, $lang, $api_key );
+            $result = $provider === 'mymemory'
+                ? self::translate_batch_mymemory( $strings, $lang )
+                : self::translate_batch( $strings, $lang, $api_key );
             if ( is_wp_error( $result ) ) {
                 $errors[] = $lang . ': ' . $result->get_error_message();
                 continue;
@@ -235,7 +244,7 @@ class DeepL_Translate {
             }
             $body_string = implode( '&', $body_parts );
 
-            $response = wp_remote_post( self::API_URL, array(
+            $response = wp_remote_post( self::DEEPL_API_URL, array(
                 'timeout' => 30,
                 'headers' => array( 'Content-Type' => 'application/x-www-form-urlencoded' ),
                 'body'    => $body_string,
@@ -266,13 +275,64 @@ class DeepL_Translate {
     }
 
     /**
+     * Translate a batch of strings via MyMemory Free API.
+     * No API key required. Limited to ~1000 words/day for anonymous use.
+     *
+     * @param array  $strings Source strings (English).
+     * @param string $target  Target language code.
+     * @return array|\WP_Error Associative array source => translated.
+     */
+    public static function translate_batch_mymemory( $strings, $target ) {
+        $results = array();
+
+        foreach ( $strings as $text ) {
+            // MyMemory translates one string at a time.
+            $url = add_query_arg( array(
+                'q'       => $text,
+                'langpair' => 'en|' . strtolower( $target ),
+            ), self::MYMEMORY_API_URL );
+
+            $response = wp_remote_get( $url, array( 'timeout' => 15 ) );
+
+            if ( is_wp_error( $response ) ) {
+                return $response;
+            }
+
+            $code = wp_remote_retrieve_response_code( $response );
+            if ( $code !== 200 ) {
+                return new \WP_Error( 'mymemory_error', 'MyMemory API error (HTTP ' . $code . ').' );
+            }
+
+            $body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+            if ( empty( $body['responseData']['translatedText'] ) ) {
+                // If quota exceeded, MyMemory returns a specific message.
+                $status = $body['responseStatus'] ?? 0;
+                if ( $status === 429 || ( isset( $body['responseDetails'] ) && stripos( $body['responseDetails'], 'limit' ) !== false ) ) {
+                    return new \WP_Error( 'mymemory_limit', 'MyMemory daily limit reached. Try again tomorrow or use DeepL.' );
+                }
+                // Use original text as fallback.
+                $results[ $text ] = $text;
+                continue;
+            }
+
+            $results[ $text ] = $body['responseData']['translatedText'];
+
+            // Small delay to respect rate limits.
+            usleep( 100000 ); // 100ms between requests.
+        }
+
+        return $results;
+    }
+
+    /**
      * Test if a DeepL API key is valid.
      *
      * @param string $api_key API key.
      * @return true|\WP_Error
      */
     public static function test_api_key( $api_key ) {
-        $response = wp_remote_get( self::LANGS_URL . '?auth_key=' . urlencode( $api_key ), array(
+        $response = wp_remote_get( self::DEEPL_LANGS_URL . '?auth_key=' . urlencode( $api_key ), array(
             'timeout' => 10,
         ) );
 

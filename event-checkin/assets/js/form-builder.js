@@ -98,9 +98,17 @@
             $('#ec-import-form').on('click', function() { $('#ec-import-file').click(); });
             $('#ec-import-file').on('change', function(e) { self.importSchema(e); });
 
-            // DeepL Translation.
+            // Translation.
             $('#ec-deepl-test').on('click', function() { self.testDeepLKey(); });
             $('#ec-deepl-translate').on('click', function() { self.generateTranslations(); });
+            $('#ec-translate-provider').on('change', function() {
+                var provider = $(this).val();
+                if (provider === 'deepl') {
+                    $('#ec-deepl-key-group').show();
+                } else {
+                    $('#ec-deepl-key-group').hide();
+                }
+            });
         },
 
         // ── Load / Save ──
@@ -727,8 +735,9 @@
         generateTranslations: function() {
             if (!this.eventId || !this.schema) { alert('Select an event and save the form first.'); return; }
 
+            var provider = $('#ec-translate-provider').val() || 'mymemory';
             var apiKey = $('#ec-deepl-api-key').val().trim();
-            if (!apiKey) { alert('Enter a DeepL API key first.'); return; }
+            if (provider === 'deepl' && !apiKey) { alert('Enter a DeepL API key first.'); return; }
 
             var languages = ['en'];
             $('.ec-lang-checkbox:checked').each(function() {
@@ -741,7 +750,7 @@
             // Store languages in schema settings.
             if (!this.schema.settings) this.schema.settings = {};
             this.schema.settings.languages = languages;
-            this.schema.settings.deepl_api_key = apiKey;
+            if (provider === 'deepl') this.schema.settings.deepl_api_key = apiKey;
 
             var $btn = $('#ec-deepl-translate');
             $btn.text('Translating...').prop('disabled', true);
@@ -751,6 +760,7 @@
                 action: 'ec_deepl_translate_form',
                 nonce: ecFormBuilder.nonce,
                 event_id: this.eventId,
+                provider: provider,
                 api_key: apiKey,
                 languages: languages
             }, function(res) {

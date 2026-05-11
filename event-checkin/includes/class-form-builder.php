@@ -229,7 +229,14 @@ class Form_Builder {
                         </div>
                         <div class="ec-settings-body">
                             <div class="ec-setting-group">
-                                <label class="ec-setting-label"><?php esc_html_e( 'DeepL API Key (Free)', 'event-checkin' ); ?></label>
+                                <label class="ec-setting-label"><?php esc_html_e( 'Translation Provider', 'event-checkin' ); ?></label>
+                                <select class="ec-setting-select" id="ec-translate-provider">
+                                    <option value="mymemory"><?php esc_html_e( 'MyMemory (Free, no key)', 'event-checkin' ); ?></option>
+                                    <option value="deepl"><?php esc_html_e( 'DeepL (Free API key)', 'event-checkin' ); ?></option>
+                                </select>
+                            </div>
+                            <div class="ec-setting-group" id="ec-deepl-key-group" style="display:none">
+                                <label class="ec-setting-label"><?php esc_html_e( 'DeepL API Key', 'event-checkin' ); ?></label>
                                 <input class="ec-setting-input" type="password" id="ec-deepl-api-key" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx">
                                 <button type="button" class="ec-builder-btn ec-builder-btn--ghost ec-btn-full" id="ec-deepl-test" style="margin-top:6px">
                                     <?php esc_html_e( 'Test Key', 'event-checkin' ); ?>

@@ -130,7 +130,8 @@ class Form_Renderer {
             .kadence-header,
             .neve-header,
             .wp-block-template-part[data-area="header"],
-            #flavor-header { display: none !important; }
+            #flavor-header,
+            .mobile_menu_wrapper { display: none !important; }
             html { margin-top: 0 !important; }
             #wpadminbar { display: none !important; }
             <?php endif; ?>
@@ -153,7 +154,9 @@ class Form_Renderer {
             .kadence-footer,
             .neve-footer,
             .wp-block-template-part[data-area="footer"],
-            #flavor-footer { display: none !important; }
+            #flavor-footer,
+            .footer_bar,
+            .footer_bar_wrapper { display: none !important; }
             <?php endif; ?>
             <?php if ( $hide_title ) : ?>
             /* Hide page title */
@@ -162,13 +165,17 @@ class Form_Renderer {
             .post-title,
             .entry-header,
             .page-header,
+            .page_title_wrapper,
+            .page_title_inner,
+            .page_title_content,
             .elementor-page-title,
             .elementor-widget-theme-page-title,
             [data-widget_type="theme-page-title.default"],
             .ast-the-title,
             .hentry .entry-title,
             .wp-block-post-title,
-            #page-title-wrapper { display: none !important; }
+            #page-title-wrapper,
+            #page_caption { display: none !important; }
             <?php endif; ?>
             /* Make form fill viewport and break out of theme container */
             .ec-form-app {
@@ -178,6 +185,27 @@ class Form_Renderer {
                 left: 50%;
                 transform: translateX(-50%);
                 box-sizing: border-box;
+            }
+            /* Override GrandConference / common theme container constraints */
+            #page_content_wrapper,
+            .inner_wrapper,
+            .standard_wrapper,
+            .page_content_wrapper,
+            .content-area,
+            .site-content,
+            .entry-content,
+            .post-content,
+            article,
+            .container,
+            .e-con,
+            main {
+                max-width: none !important;
+                width: 100% !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                overflow: visible !important;
             }
         </style>
         <?php

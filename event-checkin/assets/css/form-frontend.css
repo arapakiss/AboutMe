@@ -40,6 +40,7 @@ body:has(.ec-form-app) .e-con,
 body:has(.ec-form-app) .ast-container,
 body:has(.ec-form-app) .container,
 body:has(.ec-form-app) .wrapper,
+body:has(.ec-form-app) .inner_wrapper,
 body:has(.ec-form-app) main {
     max-width: none !important;
     width: 100% !important;
@@ -47,20 +48,24 @@ body:has(.ec-form-app) main {
     padding-right: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+    overflow: visible !important;
 }
 
 /* Fallback class for browsers without :has() support */
 body.ec-fullwidth-page #page_content_wrapper,
 body.ec-fullwidth-page .standard_wrapper,
+body.ec-fullwidth-page .inner_wrapper,
 body.ec-fullwidth-page .page_content_wrapper,
 body.ec-fullwidth-page #content,
 body.ec-fullwidth-page .content-area,
 body.ec-fullwidth-page .site-content,
 body.ec-fullwidth-page .entry-content,
+body.ec-fullwidth-page .post-content,
 body.ec-fullwidth-page .elementor-section.elementor-section-boxed > .elementor-container,
 body.ec-fullwidth-page .e-con,
 body.ec-fullwidth-page .ast-container,
 body.ec-fullwidth-page .container,
+body.ec-fullwidth-page article,
 body.ec-fullwidth-page main {
     max-width: none !important;
     width: 100% !important;
@@ -68,6 +73,7 @@ body.ec-fullwidth-page main {
     padding-right: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+    overflow: visible !important;
 }
 
 .ec-form-app {

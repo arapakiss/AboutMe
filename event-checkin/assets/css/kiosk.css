@@ -9,6 +9,48 @@
 /* Hidden utility */
 .ec-hidden { display: none !important; }
 
+/* Override theme max-width constraints for kiosk pages */
+body:has(.ec-kiosk) #page_content_wrapper,
+body:has(.ec-kiosk) .standard_wrapper,
+body:has(.ec-kiosk) .page_content_wrapper,
+body:has(.ec-kiosk) #content,
+body:has(.ec-kiosk) .content-area,
+body:has(.ec-kiosk) .site-content,
+body:has(.ec-kiosk) .entry-content,
+body:has(.ec-kiosk) .elementor-section.elementor-section-boxed > .elementor-container,
+body:has(.ec-kiosk) .e-con,
+body:has(.ec-kiosk) .ast-container,
+body:has(.ec-kiosk) .container,
+body:has(.ec-kiosk) main {
+    max-width: none !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Fallback class applied by JS for browsers without :has() support */
+body.ec-fullwidth-page #page_content_wrapper,
+body.ec-fullwidth-page .standard_wrapper,
+body.ec-fullwidth-page .page_content_wrapper,
+body.ec-fullwidth-page #content,
+body.ec-fullwidth-page .content-area,
+body.ec-fullwidth-page .site-content,
+body.ec-fullwidth-page .entry-content,
+body.ec-fullwidth-page .elementor-section.elementor-section-boxed > .elementor-container,
+body.ec-fullwidth-page .e-con,
+body.ec-fullwidth-page .ast-container,
+body.ec-fullwidth-page .container,
+body.ec-fullwidth-page main {
+    max-width: none !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
 :root {
     --ec-navy: #002d72;
     --ec-cyan: #0babe4;

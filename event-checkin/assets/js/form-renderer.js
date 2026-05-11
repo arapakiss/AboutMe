@@ -92,6 +92,9 @@
                 $('html').css('margin-top', '0');
             }
 
+            // Add fullwidth class to body as fallback for CSS :has() (Firefox <121).
+            document.body.classList.add('ec-fullwidth-page');
+
             // Calculate available height dynamically.
             // If header/footer are NOT hidden, measure them and set height accordingly.
             var self = this;

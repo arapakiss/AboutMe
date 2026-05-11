@@ -49,6 +49,9 @@
                 document.documentElement.style.marginTop = '0';
             }
 
+            // Add fullwidth class to body for CSS :has() fallback.
+            document.body.classList.add('ec-fullwidth-page');
+
             this.initScanner();
             this.initSignaturePad();
             this.updateStats();

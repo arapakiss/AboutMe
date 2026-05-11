@@ -1,0 +1,548 @@
+/**
+ * Event Check-in - Kiosk Mode Styles
+ * Istanbul Edition Design Language
+ * Navy #002d72 | Cyan #0babe4 | Dark #00122e | White #ffffff
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&display=swap');
+
+/* Hidden utility */
+.ec-hidden { display: none !important; }
+
+/* Override theme max-width constraints for kiosk pages */
+body:has(.ec-kiosk) #page_content_wrapper,
+body:has(.ec-kiosk) .standard_wrapper,
+body:has(.ec-kiosk) .page_content_wrapper,
+body:has(.ec-kiosk) #content,
+body:has(.ec-kiosk) .content-area,
+body:has(.ec-kiosk) .site-content,
+body:has(.ec-kiosk) .entry-content,
+body:has(.ec-kiosk) .elementor-section.elementor-section-boxed > .elementor-container,
+body:has(.ec-kiosk) .e-con,
+body:has(.ec-kiosk) .ast-container,
+body:has(.ec-kiosk) .container,
+body:has(.ec-kiosk) main {
+    max-width: none !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Fallback class applied by JS for browsers without :has() support */
+body.ec-fullwidth-page #page_content_wrapper,
+body.ec-fullwidth-page .standard_wrapper,
+body.ec-fullwidth-page .page_content_wrapper,
+body.ec-fullwidth-page #content,
+body.ec-fullwidth-page .content-area,
+body.ec-fullwidth-page .site-content,
+body.ec-fullwidth-page .entry-content,
+body.ec-fullwidth-page .elementor-section.elementor-section-boxed > .elementor-container,
+body.ec-fullwidth-page .e-con,
+body.ec-fullwidth-page .ast-container,
+body.ec-fullwidth-page .container,
+body.ec-fullwidth-page main {
+    max-width: none !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+:root {
+    --ec-navy: #002d72;
+    --ec-cyan: #0babe4;
+    --ec-dark: #00122e;
+    --ec-white: #ffffff;
+    --ec-gray: rgba(0, 45, 114, 0.1);
+}
+
+/* ── Layout ── */
+.ec-kiosk {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--ec-white);
+    color: var(--ec-navy);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+    z-index: 999999;
+    display: flex;
+}
+
+/* Left Hero Panel (desktop only) */
+.ec-kiosk-hero {
+    display: none;
+    width: 50%;
+    background: var(--ec-navy);
+    color: var(--ec-white);
+    position: relative;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+}
+
+@media (min-width: 1024px) {
+    .ec-kiosk-hero {
+        display: flex;
+    }
+}
+
+.ec-kiosk-hero-ghost {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.ec-kiosk-hero-ghost span {
+    font-size: 10vw;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    opacity: 0.08;
+    white-space: nowrap;
+}
+
+.ec-kiosk-hero-content {
+    position: relative;
+    z-index: 10;
+    max-width: 400px;
+}
+
+.ec-kiosk-hero-content h1 {
+    font-size: 48px;
+    font-weight: 800;
+    font-style: italic;
+    line-height: 1.1;
+    margin: 0 0 16px;
+}
+
+.ec-kiosk-hero-content p {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 24px;
+    opacity: 0.9;
+}
+
+.ec-kiosk-hero-content .ec-powered {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    opacity: 0.5;
+}
+
+/* Right Workflow Panel */
+.ec-kiosk-workflow {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .ec-kiosk-workflow {
+        padding: 48px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .ec-kiosk-workflow {
+        padding: 80px;
+    }
+}
+
+/* Progress Steps */
+.ec-kiosk-progress {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+.ec-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ec-step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--ec-navy);
+    color: var(--ec-navy);
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.ec-step-number.active {
+    background: var(--ec-navy);
+    color: var(--ec-white);
+}
+
+.ec-step-number.done {
+    background: var(--ec-cyan);
+    border-color: var(--ec-cyan);
+    color: var(--ec-white);
+}
+
+.ec-step-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ec-navy);
+}
+
+.ec-step-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--ec-gray);
+}
+
+/* Event title area */
+.ec-kiosk-event-title {
+    text-align: right;
+    margin-left: auto;
+}
+
+.ec-kiosk-event-title h2 {
+    font-size: 28px;
+    font-weight: 800;
+    font-style: italic;
+    margin: 0;
+}
+
+.ec-kiosk-event-title h2 .accent {
+    color: var(--ec-cyan);
+}
+
+.ec-kiosk-event-title p {
+    font-size: 13px;
+    opacity: 0.5;
+    margin: 4px 0 0;
+}
+
+/* ── Screens ── */
+.ec-kiosk-screen {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.ec-kiosk-screen.active {
+    display: flex;
+}
+
+.ec-section-title {
+    font-size: 28px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: var(--ec-navy);
+    margin: 0 0 24px;
+}
+
+.ec-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin: 0 0 8px;
+}
+
+/* Primary button - Istanbul Edition style */
+.ec-btn {
+    display: inline-block;
+    padding: 16px 40px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 2px solid var(--ec-navy);
+    background: var(--ec-white);
+    color: var(--ec-navy);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.ec-btn:hover {
+    background: var(--ec-navy);
+    color: var(--ec-white);
+}
+
+.ec-btn:active {
+    transform: scale(0.97);
+}
+
+.ec-btn--primary {
+    background: var(--ec-navy);
+    color: var(--ec-white);
+}
+
+.ec-btn--primary:hover {
+    background: var(--ec-dark);
+    border-color: var(--ec-dark);
+}
+
+.ec-btn--secondary {
+    background: transparent;
+    color: var(--ec-navy);
+    border-color: rgba(0, 45, 114, 0.3);
+}
+
+.ec-btn--secondary:hover {
+    border-color: var(--ec-navy);
+    background: rgba(0, 45, 114, 0.05);
+    color: var(--ec-navy);
+}
+
+/* Scanner screen -- larger viewport for better QR recognition */
+.ec-scanner-viewport {
+    width: min(420px, 70vw);
+    height: min(420px, 70vw);
+    overflow: hidden;
+    border: 3px solid var(--ec-navy);
+    margin: 24px auto;
+}
+
+.ec-scanner-viewport video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ec-kiosk-stats {
+    margin-top: 24px;
+    font-size: 14px;
+    color: rgba(0, 45, 114, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.ec-kiosk-stats span {
+    font-weight: 800;
+    color: var(--ec-cyan);
+    font-size: 18px;
+}
+
+/* Processing screen */
+.ec-kiosk-screen--processing {
+    background: var(--ec-white);
+}
+
+.ec-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--ec-gray);
+    border-top-color: var(--ec-navy);
+    border-radius: 50%;
+    animation: ec-spin 0.8s linear infinite;
+}
+
+@keyframes ec-spin {
+    to { transform: rotate(360deg); }
+}
+
+.ec-kiosk-screen--processing p {
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 16px;
+    color: var(--ec-navy);
+}
+
+/* Signature screen */
+.ec-kiosk-screen--signature {
+    background: var(--ec-white);
+}
+
+.ec-welcome-name {
+    font-size: 22px;
+    color: var(--ec-cyan);
+    font-weight: 700;
+    margin: 0 0 24px;
+}
+
+.ec-signature-wrapper {
+    background: var(--ec-white);
+    border: 2px solid var(--ec-navy);
+    padding: 4px;
+}
+
+#ec-signature-pad {
+    display: block;
+    touch-action: none;
+    cursor: crosshair;
+}
+
+.ec-signature-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+@keyframes ec-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+}
+
+/* Success screen */
+.ec-kiosk-screen--success {
+    background: var(--ec-white);
+}
+
+.ec-success-checkmark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border: 3px solid var(--ec-navy);
+    border-radius: 50%;
+    font-size: 40px;
+    color: var(--ec-navy);
+    margin-bottom: 20px;
+    animation: ec-pop 0.4s ease-out;
+}
+
+@keyframes ec-pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.ec-kiosk-screen--success h2 {
+    font-size: 28px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--ec-navy);
+    margin: 0 0 8px;
+}
+
+/* Already checked in screen */
+.ec-kiosk-screen--already {
+    background: var(--ec-white);
+}
+
+.ec-already-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border: 3px solid var(--ec-cyan);
+    border-radius: 50%;
+    font-size: 40px;
+    color: var(--ec-cyan);
+    margin-bottom: 20px;
+}
+
+.ec-kiosk-screen--already h2 {
+    font-size: 28px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--ec-navy);
+}
+
+/* Error screen */
+.ec-kiosk-screen--error {
+    background: var(--ec-white);
+}
+
+.ec-error-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border: 3px solid #dc2626;
+    border-radius: 50%;
+    font-size: 40px;
+    color: #dc2626;
+    margin-bottom: 20px;
+}
+
+.ec-kiosk-screen--error h2 {
+    font-size: 28px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--ec-navy);
+}
+
+/* Auto-reset countdown */
+.ec-auto-reset {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.ec-auto-reset p {
+    font-size: 12px;
+    color: rgba(0, 45, 114, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 10px;
+}
+
+.ec-countdown-bar {
+    width: 200px;
+    height: 3px;
+    background: var(--ec-gray);
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.ec-countdown-fill {
+    height: 100%;
+    background: var(--ec-navy);
+    width: 100%;
+    transition: width linear;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ec-scanner-viewport {
+        width: 260px;
+        height: 260px;
+    }
+
+    .ec-section-title {
+        font-size: 22px;
+    }
+
+    #ec-signature-pad {
+        width: 380px;
+        height: 140px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ec-scanner-viewport {
+        width: 220px;
+        height: 220px;
+    }
+
+    #ec-signature-pad {
+        width: 280px;
+        height: 100px;
+    }
+}

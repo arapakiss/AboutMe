@@ -1,0 +1,240 @@
+/**
+ * Event Check-in - Public Registration Form Styles
+ * Istanbul Edition Design Language
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&display=swap');
+
+:root {
+    --ec-navy: #002d72;
+    --ec-cyan: #0babe4;
+    --ec-dark: #00122e;
+    --ec-white: #ffffff;
+    --ec-gray: rgba(0, 45, 114, 0.1);
+}
+
+.ec-registration-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--ec-navy);
+}
+
+/* Header */
+.ec-event-header {
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--ec-gray);
+}
+
+.ec-event-header h2 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 800;
+    font-style: italic;
+    color: var(--ec-navy);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+}
+
+.ec-event-description {
+    color: var(--ec-dark);
+    font-size: 15px;
+    line-height: 1.6;
+    opacity: 0.7;
+}
+
+.ec-event-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 12px;
+}
+
+.ec-event-meta span {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ec-navy);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ec-event-meta .ec-date::before {
+    content: "\1F4C5 ";
+}
+
+.ec-event-meta .ec-location::before {
+    content: "\1F4CD ";
+}
+
+/* Form */
+.ec-registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ec-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ec-field label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ec-navy);
+    opacity: 0.6;
+}
+
+.ec-field input[type="text"],
+.ec-field input[type="email"],
+.ec-field input[type="tel"],
+.ec-field textarea,
+.ec-field select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--ec-navy);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ec-navy);
+    background: var(--ec-white);
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+    border-radius: 0;
+    -webkit-appearance: none;
+}
+
+.ec-field input:focus,
+.ec-field textarea:focus,
+.ec-field select:focus {
+    outline: none;
+    border-color: var(--ec-cyan);
+}
+
+.ec-field input.ec-invalid,
+.ec-field textarea.ec-invalid,
+.ec-field select.ec-invalid {
+    border-color: #dc2626;
+}
+
+.ec-field .ec-field-error {
+    font-size: 12px;
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.ec-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    opacity: 1 !important;
+    cursor: pointer;
+}
+
+/* Submit button - Istanbul Edition style */
+.ec-submit-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ec-navy);
+    border: 2px solid var(--ec-navy);
+    background: var(--ec-white);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    border-radius: 0;
+}
+
+.ec-submit-btn:hover {
+    background: var(--ec-navy);
+    color: var(--ec-white);
+}
+
+.ec-submit-btn:active {
+    transform: scale(0.97);
+}
+
+.ec-submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Messages */
+.ec-message {
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.ec-message--error {
+    background: rgba(220, 38, 38, 0.05);
+    border-left: 4px solid #dc2626;
+    color: #991b1b;
+}
+
+.ec-message--success {
+    background: rgba(11, 171, 228, 0.05);
+    border-left: 4px solid var(--ec-cyan);
+    color: var(--ec-navy);
+}
+
+/* Success panel */
+.ec-success-panel {
+    text-align: center;
+    padding: 48px 20px;
+}
+
+.ec-success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border: 3px solid var(--ec-navy);
+    border-radius: 50%;
+    font-size: 36px;
+    color: var(--ec-navy);
+    margin-bottom: 20px;
+}
+
+.ec-success-panel h3 {
+    font-size: 28px;
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    color: var(--ec-navy);
+    margin: 0 0 8px;
+}
+
+.ec-success-panel p {
+    font-size: 15px;
+    color: var(--ec-dark);
+    opacity: 0.7;
+}
+
+.ec-qr-preview img {
+    max-width: 200px;
+    margin-top: 20px;
+    border: 3px solid var(--ec-navy);
+}
+
+.ec-error {
+    padding: 18px;
+    border-left: 4px solid #dc2626;
+    background: rgba(220, 38, 38, 0.05);
+    color: #991b1b;
+    font-weight: 600;
+}

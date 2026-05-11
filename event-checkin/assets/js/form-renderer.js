@@ -568,6 +568,70 @@
                     $el.text(trans[key]);
                 }
             });
+
+            // Handle Greek uppercase: strip accents (tonos) from uppercase text.
+            // In Greek, capital letters do not carry accents.
+            this.handleGreekUppercase(this.currentLang);
+        },
+
+        /**
+         * Greek uppercase rule: capital letters should not have accents.
+         * When language is Greek, disable CSS text-transform:uppercase and
+         * manually uppercase text with accents stripped.
+         */
+        handleGreekUppercase: function(lang) {
+            var $app = $('#ec-form-app');
+            var isGreek = (lang === 'el');
+
+            // Toggle class that disables CSS text-transform: uppercase
+            $app.toggleClass('ec-lang-el', isGreek);
+            $('body').toggleClass('ec-lang-el', isGreek);
+
+            if (!isGreek) return;
+
+            // Greek accent map: lowercase accented -> uppercase without accent
+            var greekAccentMap = {
+                '\u03AC': '\u0391', // a with tonos -> Alpha
+                '\u03AD': '\u0395', // e with tonos -> Epsilon
+                '\u03AE': '\u0397', // eta with tonos -> Eta
+                '\u03AF': '\u0399', // i with tonos -> Iota
+                '\u03CC': '\u039F', // o with tonos -> Omicron
+                '\u03CD': '\u03A5', // y with tonos -> Upsilon
+                '\u03CE': '\u03A9', // omega with tonos -> Omega
+                '\u0390': '\u0399', // i with dialytika+tonos -> Iota
+                '\u03B0': '\u03A5', // y with dialytika+tonos -> Upsilon
+                '\u03CA': '\u0399', // i with dialytika -> Iota (uppercase)
+                '\u03CB': '\u03A5'  // y with dialytika -> Upsilon (uppercase)
+            };
+
+            function greekUppercase(text) {
+                var result = '';
+                for (var i = 0; i < text.length; i++) {
+                    var ch = text[i];
+                    if (greekAccentMap[ch]) {
+                        result += greekAccentMap[ch];
+                    } else {
+                        result += ch.toUpperCase();
+                    }
+                }
+                return result;
+            }
+
+            // Find all elements with CSS text-transform: uppercase and manually set text.
+            var uppercaseSelectors = '.ec-form-pill, .ec-form-headline, .ec-form-question-title, .ec-form-kicker, .ec-form-btn, .ec-form-step-no, .ec-form-topbar h2, .ec-form-left::before';
+
+            // For real elements (not pseudo), store original and set uppercase.
+            $(uppercaseSelectors.replace(', .ec-form-left::before', '')).each(function() {
+                var $el = $(this);
+                // Store the mixed-case text and replace with Greek uppercase.
+                var text = $el.text();
+                if (text && /[\u0370-\u03FF\u1F00-\u1FFF]/.test(text)) {
+                    if (!$el.data('greek-original')) {
+                        $el.data('greek-original', text);
+                    }
+                    $el.text(greekUppercase(text));
+                }
+            });
         },
 
         // ── Company Info Card ──

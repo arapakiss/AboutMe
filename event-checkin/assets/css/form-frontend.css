@@ -983,3 +983,19 @@ body.ec-fullwidth-page main {
     .ec-form-content { grid-template-columns: 1fr; }
     .ec-ff[data-width] { grid-column: span 1 !important; }
 }
+
+/* Greek language: disable CSS uppercase so JS can handle accent stripping.
+   In Greek, capital letters do not carry accents (tonos). */
+.ec-lang-el .ec-form-pill,
+.ec-lang-el .ec-form-headline,
+.ec-lang-el .ec-form-question-title,
+.ec-lang-el .ec-form-kicker,
+.ec-lang-el .ec-form-btn,
+.ec-lang-el .ec-form-step-no,
+.ec-lang-el .ec-form-topbar h2,
+.ec-lang-el .ec-form-step-title,
+.ec-lang-el .ec-form-lang-select,
+.ec-lang-el .ec-ff-label,
+.ec-lang-el .ec-company-card-type {
+    text-transform: none !important;
+}

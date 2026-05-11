@@ -34,11 +34,13 @@ class QRCode {
         ), home_url( '/' ) );
 
         // Generate QR code using bundled library.
-        // Use high error correction (H) and larger module size (10) for
-        // better scanning reliability from phone/tablet cameras.
+        // Use medium error correction (M = 15% recovery) for the best balance
+        // between scan reliability and code density. H-level (30%) creates
+        // overly dense codes that are harder to read on phone cameras.
+        // Module size 10 with margin 2 keeps the code clean and scannable.
         require_once EC_PLUGIN_DIR . 'lib/phpqrcode.php';
 
-        \QRcode::png( $checkin_url, $filepath, QR_ECLEVEL_H, 10, 4 );
+        \QRcode::png( $checkin_url, $filepath, QR_ECLEVEL_M, 10, 2 );
 
         if ( file_exists( $filepath ) ) {
             return $upload_dir['baseurl'] . '/event-checkin/qrcodes/' . $filename;

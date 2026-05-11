@@ -85,19 +85,26 @@
         startScanning: function () {
             var self = this;
 
-            // Use a larger scan area and higher fps for better QR recognition.
-            // formatsToSupport restricts to QR codes only (skips barcode detection).
-            var qrboxSize = Math.min(350, Math.floor(window.innerWidth * 0.6));
+            // Calculate scan box to fit within the viewport container.
+            // Keep it smaller than the video feed for reliable edge detection.
+            var viewportEl = document.getElementById('ec-scanner-viewport');
+            var containerWidth = viewportEl ? viewportEl.offsetWidth : 300;
+            var qrboxSize = Math.min(280, Math.floor(containerWidth * 0.7));
+
             this.scanner.start(
                 { facingMode: 'environment' },
                 {
-                    fps: 15,
+                    fps: 10,
                     qrbox: { width: qrboxSize, height: qrboxSize },
-                    aspectRatio: 1.0,
                     formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ],
+                    // Disable BarcodeDetector API -- it causes false negatives
+                    // on some browsers/devices where the API exists but performs
+                    // worse than the JS-based ZXing decoder.
                     experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: true
-                    }
+                        useBarCodeDetectorIfSupported: false
+                    },
+                    // Remove aspectRatio constraint to let the camera use its
+                    // native ratio; forcing 1.0 can crop the feed on some devices.
                 },
                 function (decodedText) {
                     self.onScanSuccess(decodedText);
@@ -106,8 +113,17 @@
                     // Ignore scan failures (normal during scanning).
                 }
             ).catch(function (err) {
-                console.error('Camera error:', err);
-                self.showScreen('error', ecKiosk.i18n.cameraError);
+                console.error('Camera start error:', err);
+                // Fallback: try without format restriction.
+                self.scanner.start(
+                    { facingMode: 'environment' },
+                    { fps: 10, qrbox: { width: qrboxSize, height: qrboxSize } },
+                    function (decodedText) { self.onScanSuccess(decodedText); },
+                    function () {}
+                ).catch(function (fallbackErr) {
+                    console.error('Camera fallback error:', fallbackErr);
+                    self.showScreen('error', ecKiosk.i18n.cameraError);
+                });
             });
         },
 
@@ -146,24 +162,43 @@
 
         /**
          * Extract token from a URL or raw QR content.
+         * Handles: full URLs, URLs with fragments, raw hex tokens.
          */
         extractToken: function (text) {
-            // Try to extract from URL parameter.
+            if (!text || typeof text !== 'string') {
+                console.warn('[EC] Empty or invalid scan result');
+                return null;
+            }
+
+            text = text.trim();
+            console.log('[EC] Scanned content:', text.substring(0, 80) + (text.length > 80 ? '...' : ''));
+
+            // Method 1: Try to extract from URL parameter.
             try {
                 var url = new URL(text);
                 var token = url.searchParams.get('ec_token');
-                if (token && token.length === 64) {
+                if (token && /^[a-f0-9]{64}$/i.test(token)) {
+                    console.log('[EC] Token extracted from URL parameter');
                     return token;
                 }
             } catch (e) {
-                // Not a URL, check if it's a raw token.
+                // Not a valid URL -- continue to other methods.
             }
 
-            // Check if raw text is a valid token (64-char hex).
+            // Method 2: Try regex extraction from any string containing ec_token=.
+            var match = text.match(/ec_token=([a-f0-9]{64})/i);
+            if (match) {
+                console.log('[EC] Token extracted via regex');
+                return match[1];
+            }
+
+            // Method 3: Check if raw text is a valid token (64-char hex).
             if (/^[a-f0-9]{64}$/i.test(text)) {
+                console.log('[EC] Raw hex token detected');
                 return text;
             }
 
+            console.warn('[EC] Could not extract token from scanned content');
             return null;
         },
 

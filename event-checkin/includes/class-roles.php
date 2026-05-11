@@ -24,10 +24,14 @@ class Roles {
         remove_role( self::STAFF_ROLE );
 
         add_role( self::STAFF_ROLE, __( 'Event Staff', 'event-checkin' ), array(
-            'read'              => true,
-            'ec_view_events'    => true,
-            'ec_manage_checkin' => true,
+            'read'                  => true,
+            'ec_view_events'        => true,
+            'ec_manage_checkin'     => true,
             'ec_view_registrations' => true,
+            'ec_edit_registrations' => true,
+            'ec_resend_emails'      => true,
+            'ec_download_qr'        => true,
+            'ec_view_dashboard'     => true,
         ) );
 
         // Grant admin all EC capabilities.
@@ -37,6 +41,10 @@ class Roles {
             $admin->add_cap( 'ec_manage_events' );
             $admin->add_cap( 'ec_manage_checkin' );
             $admin->add_cap( 'ec_view_registrations' );
+            $admin->add_cap( 'ec_edit_registrations' );
+            $admin->add_cap( 'ec_resend_emails' );
+            $admin->add_cap( 'ec_download_qr' );
+            $admin->add_cap( 'ec_view_dashboard' );
             $admin->add_cap( 'ec_export_data' );
             $admin->add_cap( 'ec_manage_settings' );
         }
@@ -55,6 +63,10 @@ class Roles {
                 'ec_manage_events',
                 'ec_manage_checkin',
                 'ec_view_registrations',
+                'ec_edit_registrations',
+                'ec_resend_emails',
+                'ec_download_qr',
+                'ec_view_dashboard',
                 'ec_export_data',
                 'ec_manage_settings',
             );

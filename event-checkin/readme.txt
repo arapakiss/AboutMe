@@ -4,7 +4,7 @@ Tags: events, registration, qr-code, check-in, kiosk, signature
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,24 @@ Yes, but it includes an offline queue that retries failed check-ins when connect
 Yes, each event can have custom fields (text, textarea, select, checkbox) in addition to the default name, email, and phone fields.
 
 == Changelog ==
+
+= 1.2.0 =
+* NEW: Event Dashboard - comprehensive per-event management view
+* NEW: Stats cards showing registration counts, check-in progress, capacity usage
+* NEW: Search registrations by name, email, or phone
+* NEW: Filter registrations by status (registered, checked in, cancelled)
+* NEW: Pagination for large registration lists
+* NEW: Edit registration details via AJAX modal (name, email, phone, status, custom fields)
+* NEW: Add registrations manually from the dashboard
+* NEW: Resend confirmation email to original or alternate address
+* NEW: Download individual QR codes as PNG files
+* NEW: Manual check-in and cancel from dashboard
+* NEW: Toast notifications for all dashboard actions
+* NEW: Staff role capabilities for edit, resend email, download QR, and dashboard access
+* FIX: QR scanner recognition - lowered error correction from H to M for less dense codes
+* FIX: Disabled browser BarcodeDetector API that caused false negatives on some devices
+* FIX: Removed forced 1:1 aspect ratio that cropped camera feed on some devices
+* FIX: Improved token extraction with regex fallback and debug logging
 
 = 1.0.0 =
 * Initial release

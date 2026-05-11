@@ -73,13 +73,18 @@ body.ec-fullwidth-page main {
 .ec-form-app {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     color: var(--ecf-navy);
-    width: 100%;
+    width: 100vw;
     height: 100vh;
     max-height: 100vh;
     display: grid;
     grid-template-columns: minmax(240px, 24vw) minmax(0, 1fr);
     background: linear-gradient(90deg, #fff 0%, #fff 24%, #eef3f8 24%, #f8fafc 100%);
     overflow: hidden;
+    /* Break out of any theme content container to fill viewport width */
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
 }
 
 /* Fullscreen mode (header/footer hidden) */

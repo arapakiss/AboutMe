@@ -170,10 +170,15 @@ class Form_Renderer {
             .wp-block-post-title,
             #page-title-wrapper { display: none !important; }
             <?php endif; ?>
-            <?php if ( $hide_header || $hide_footer ) : ?>
-            /* Make form fill viewport */
-            .ec-form-app { min-height: 100vh; }
-            <?php endif; ?>
+            /* Make form fill viewport and break out of theme container */
+            .ec-form-app {
+                width: 100vw !important;
+                min-height: 100vh;
+                position: relative;
+                left: 50%;
+                transform: translateX(-50%);
+                box-sizing: border-box;
+            }
         </style>
         <?php
         endif;

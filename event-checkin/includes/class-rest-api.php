@@ -258,6 +258,9 @@ class Rest_API {
             return new \WP_REST_Response( array( 'message' => 'Translation not found.' ), 404 );
         }
 
-        return new \WP_REST_Response( $translations, 200 );
+        $response = new \WP_REST_Response( $translations, 200 );
+        // Cache translation responses for 1 hour at the HTTP level (CDN/browser).
+        $response->header( 'Cache-Control', 'public, max-age=3600' );
+        return $response;
     }
 }

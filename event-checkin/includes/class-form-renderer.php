@@ -637,7 +637,12 @@ class Form_Renderer {
      *
      * @return array Associative array of code => name.
      */
+    private static $country_cache = null;
+
     public static function get_country_list() {
+        if ( self::$country_cache !== null ) {
+            return self::$country_cache;
+        }
         $list = array(
             'AF' => 'Afghanistan', 'AL' => 'Albania', 'DZ' => 'Algeria', 'AD' => 'Andorra',
             'AO' => 'Angola', 'AR' => 'Argentina', 'AM' => 'Armenia', 'AU' => 'Australia',
@@ -668,7 +673,8 @@ class Form_Renderer {
             'VE' => 'Venezuela', 'VN' => 'Vietnam',
         );
         asort( $list );
-        return apply_filters( 'ec_country_list', $list );
+        self::$country_cache = apply_filters( 'ec_country_list', $list );
+        return self::$country_cache;
     }
 
     /**

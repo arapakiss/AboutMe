@@ -753,8 +753,30 @@
             if (provider === 'deepl') this.schema.settings.deepl_api_key = apiKey;
 
             var $btn = $('#ec-deepl-translate');
-            $btn.text('Translating...').prop('disabled', true);
+            $btn.text('Saving form...').prop('disabled', true);
 
+            // Auto-save form first so the DB has the current schema for translation extraction.
+            var self = this;
+            $.post(ecFormBuilder.ajaxUrl, {
+                action: 'ec_save_form_schema',
+                nonce: ecFormBuilder.nonce,
+                event_id: this.eventId,
+                schema: JSON.stringify(this.schema)
+            }, function(saveRes) {
+                if (!saveRes.success) {
+                    $btn.text('Generate Translations').prop('disabled', false);
+                    $('#ec-deepl-status').text('Failed to save form before translating.').css('color', '#dc2626');
+                    return;
+                }
+                $btn.text('Translating...');
+                self.doTranslateRequest(apiKey, languages, $btn);
+            }).fail(function() {
+                $btn.text('Generate Translations').prop('disabled', false);
+                $('#ec-deepl-status').text('Save request failed.').css('color', '#dc2626');
+            });
+        },
+
+        doTranslateRequest: function(apiKey, languages, $btn) {
             var self = this;
             $.post(ecFormBuilder.ajaxUrl, {
                 action: 'ec_deepl_translate_form',

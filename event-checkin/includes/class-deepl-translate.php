@@ -236,7 +236,6 @@ class DeepL_Translate {
             // WordPress wp_remote_post serializes arrays as text[0], text[1], etc.
             // We need to build the body string manually for repeated keys.
             $body_parts = array(
-                'auth_key=' . urlencode( $api_key ),
                 'target_lang=' . urlencode( $deepl_lang ),
             );
             foreach ( $chunk as $text ) {
@@ -246,7 +245,10 @@ class DeepL_Translate {
 
             $response = wp_remote_post( self::DEEPL_API_URL, array(
                 'timeout' => 30,
-                'headers' => array( 'Content-Type' => 'application/x-www-form-urlencoded' ),
+                'headers' => array(
+                    'Content-Type'  => 'application/x-www-form-urlencoded',
+                    'Authorization' => 'DeepL-Auth-Key ' . $api_key,
+                ),
                 'body'    => $body_string,
             ) );
 
@@ -332,8 +334,12 @@ class DeepL_Translate {
      * @return true|\WP_Error
      */
     public static function test_api_key( $api_key ) {
-        $response = wp_remote_get( self::DEEPL_LANGS_URL . '?auth_key=' . urlencode( $api_key ), array(
+        // Use Authorization header instead of URL param to avoid key leaking in logs.
+        $response = wp_remote_get( self::DEEPL_LANGS_URL, array(
             'timeout' => 10,
+            'headers' => array(
+                'Authorization' => 'DeepL-Auth-Key ' . $api_key,
+            ),
         ) );
 
         if ( is_wp_error( $response ) ) {
@@ -359,8 +365,15 @@ class DeepL_Translate {
      * @return array|null Translation map or null.
      */
     public static function load_translations( $event_id, $lang ) {
+        // Try object cache / transient first (avoids filesystem read on every request).
+        $cache_key = 'ec_trans_' . $event_id . '_' . $lang;
+        $cached    = Settings::cache_get( $cache_key );
+        if ( $cached && is_array( $cached ) ) {
+            return $cached;
+        }
+
         $upload_dir = wp_upload_dir();
-        $file       = $upload_dir['basedir'] . '/ec-translations/form-' . $event_id . '-' . $lang . '.json';
+        $file       = $upload_dir['basedir'] . '/ec-translations/form-' . intval( $event_id ) . '-' . preg_replace( '/[^a-z]/', '', $lang ) . '.json';
 
         if ( ! file_exists( $file ) ) {
             return null;
@@ -369,6 +382,12 @@ class DeepL_Translate {
         $contents = file_get_contents( $file );
         $data     = json_decode( $contents, true );
 
-        return is_array( $data ) ? $data : null;
+        if ( is_array( $data ) ) {
+            // Cache for 1 hour to avoid repeated filesystem reads under load.
+            Settings::cache_set( $cache_key, $data, 3600 );
+            return $data;
+        }
+
+        return null;
     }
 }

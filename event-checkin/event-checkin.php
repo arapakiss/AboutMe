@@ -74,6 +74,7 @@ require_once EC_PLUGIN_DIR . 'includes/class-form-builder.php';
 require_once EC_PLUGIN_DIR . 'includes/class-form-renderer.php';
 require_once EC_PLUGIN_DIR . 'includes/class-deepl-translate.php';
 require_once EC_PLUGIN_DIR . 'includes/class-verification.php';
+require_once EC_PLUGIN_DIR . 'includes/class-staff-app.php';
 
 add_action( 'plugins_loaded', function () {
     EventCheckin\Security::init();
@@ -89,4 +90,5 @@ add_action( 'plugins_loaded', function () {
     EventCheckin\Form_Renderer::init();
     EventCheckin\DeepL_Translate::init();
     EventCheckin\Verification::init();
+    EventCheckin\Staff_App::init();
 });

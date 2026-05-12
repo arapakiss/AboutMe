@@ -3,7 +3,7 @@
  * Plugin Name: Event Check-in
  * Plugin URI: https://github.com/arapakiss/AboutMe
  * Description: Event registration system with QR codes, self-service kiosk check-in, digital signatures, and Excel export.
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author: Alexander Arapakis
  * Author URI: https://github.com/arapakiss
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'EC_VERSION', '1.2.1' );
+define( 'EC_VERSION', '1.2.2' );
 define( 'EC_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'EC_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -75,6 +75,18 @@ require_once EC_PLUGIN_DIR . 'includes/class-form-renderer.php';
 require_once EC_PLUGIN_DIR . 'includes/class-deepl-translate.php';
 require_once EC_PLUGIN_DIR . 'includes/class-verification.php';
 require_once EC_PLUGIN_DIR . 'includes/class-staff-app.php';
+
+// GitHub auto-updater: checks releases on arapakiss/AboutMe for new versions.
+require_once EC_PLUGIN_DIR . 'lib/plugin-update-checker/plugin-update-checker.php';
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
+$ec_update_checker = PucFactory::buildUpdateChecker(
+    'https://github.com/arapakiss/AboutMe/',
+    __FILE__,
+    'event-checkin'
+);
+// Use GitHub releases as the source. The release tag must match the version (e.g. v1.2.2).
+$ec_update_checker->getVcsApi()->enableReleaseAssets();
 
 add_action( 'plugins_loaded', function () {
     EventCheckin\Security::init();

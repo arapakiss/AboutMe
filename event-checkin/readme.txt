@@ -4,7 +4,7 @@ Tags: events, registration, qr-code, check-in, kiosk, signature
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,6 +64,10 @@ Yes, but it includes an offline queue that retries failed check-ins when connect
 Yes, each event can have custom fields (text, textarea, select, checkbox) in addition to the default name, email, and phone fields.
 
 == Changelog ==
+
+= 1.2.2 =
+* NEW: GitHub auto-updater - plugin now checks for new releases and shows update notifications in wp-admin
+* WordPress will notify you when a new version is available, with one-click update support
 
 = 1.2.1 =
 * FIX: View QR code, Edit, and Resend Email modals not appearing when clicked

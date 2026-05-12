@@ -28,19 +28,20 @@ class QRCode {
         $filename = 'qr-' . substr( $token, 0, 16 ) . '.png';
         $filepath = $dir . '/' . $filename;
 
-        // Build the check-in URL that the QR code will encode.
-        $checkin_url = add_query_arg( array(
-            'ec_token' => $token,
-        ), home_url( '/' ) );
+        // Build a short, clean check-in URL for the QR code.
+        // Uses /ec/TOKEN path format instead of query params to keep
+        // the encoded content shorter and the QR code less dense.
+        $checkin_url = home_url( '/ec/' . $token );
 
         // Generate QR code using bundled library.
         // Use medium error correction (M = 15% recovery) for the best balance
         // between scan reliability and code density. H-level (30%) creates
         // overly dense codes that are harder to read on phone cameras.
-        // Module size 10 with margin 2 keeps the code clean and scannable.
+        // Module size 12 with margin 4 produces larger pixel blocks for
+        // better camera recognition at distance while keeping file size reasonable.
         require_once EC_PLUGIN_DIR . 'lib/phpqrcode.php';
 
-        \QRcode::png( $checkin_url, $filepath, QR_ECLEVEL_M, 10, 2 );
+        \QRcode::png( $checkin_url, $filepath, QR_ECLEVEL_M, 12, 4 );
 
         if ( file_exists( $filepath ) ) {
             return $upload_dir['baseurl'] . '/event-checkin/qrcodes/' . $filename;

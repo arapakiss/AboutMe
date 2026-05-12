@@ -25,6 +25,9 @@ class Admin {
         add_action( 'wp_ajax_ec_manual_checkin', array( __CLASS__, 'ajax_manual_checkin' ) );
         add_action( 'wp_ajax_ec_cancel_registration', array( __CLASS__, 'ajax_cancel_registration' ) );
         add_action( 'wp_ajax_ec_add_registration', array( __CLASS__, 'ajax_add_registration' ) );
+        add_action( 'wp_ajax_ec_view_qr', array( __CLASS__, 'ajax_view_qr' ) );
+        add_action( 'wp_ajax_ec_regenerate_qr', array( __CLASS__, 'ajax_regenerate_qr' ) );
+        add_action( 'wp_ajax_ec_bulk_action', array( __CLASS__, 'ajax_bulk_action' ) );
     }
 
     /**
@@ -1031,10 +1034,36 @@ class Admin {
                 </span>
             </div>
 
+            <!-- Bulk Actions Bar -->
+            <div class="ec-bulk-bar" id="ec-bulk-bar" style="display:none;">
+                <span class="ec-bulk-count"><strong id="ec-bulk-count">0</strong> <?php esc_html_e( 'selected', 'event-checkin' ); ?></span>
+                <div class="ec-bulk-buttons">
+                    <?php if ( current_user_can( 'ec_manage_checkin' ) ) : ?>
+                        <button type="button" class="button button-small ec-bulk-btn" data-action="checkin">
+                            <span class="dashicons dashicons-yes-alt"></span> <?php esc_html_e( 'Check In', 'event-checkin' ); ?>
+                        </button>
+                    <?php endif; ?>
+                    <?php if ( current_user_can( 'ec_edit_registrations' ) ) : ?>
+                        <button type="button" class="button button-small ec-bulk-btn" data-action="cancel">
+                            <span class="dashicons dashicons-dismiss"></span> <?php esc_html_e( 'Cancel', 'event-checkin' ); ?>
+                        </button>
+                    <?php endif; ?>
+                    <?php if ( current_user_can( 'ec_resend_emails' ) ) : ?>
+                        <button type="button" class="button button-small ec-bulk-btn" data-action="resend">
+                            <span class="dashicons dashicons-email"></span> <?php esc_html_e( 'Resend Email', 'event-checkin' ); ?>
+                        </button>
+                    <?php endif; ?>
+                    <button type="button" class="button button-small" id="ec-bulk-deselect">
+                        <?php esc_html_e( 'Deselect All', 'event-checkin' ); ?>
+                    </button>
+                </div>
+            </div>
+
             <!-- Registrations Table -->
             <table class="wp-list-table widefat fixed striped ec-dash-table" id="ec-registrations-table">
                 <thead>
                     <tr>
+                        <th class="ec-col-check"><input type="checkbox" id="ec-select-all" title="<?php esc_attr_e( 'Select all', 'event-checkin' ); ?>"></th>
                         <th class="ec-col-name"><?php esc_html_e( 'Name', 'event-checkin' ); ?></th>
                         <th class="ec-col-email"><?php esc_html_e( 'Email', 'event-checkin' ); ?></th>
                         <th class="ec-col-phone"><?php esc_html_e( 'Phone', 'event-checkin' ); ?></th>
@@ -1046,10 +1075,11 @@ class Admin {
                 </thead>
                 <tbody>
                     <?php if ( empty( $registrations ) ) : ?>
-                        <tr><td colspan="7" class="ec-dash-empty"><?php esc_html_e( 'No registrations found.', 'event-checkin' ); ?></td></tr>
+                        <tr><td colspan="8" class="ec-dash-empty"><?php esc_html_e( 'No registrations found.', 'event-checkin' ); ?></td></tr>
                     <?php else : ?>
                         <?php foreach ( $registrations as $reg ) : ?>
                             <tr id="ec-reg-row-<?php echo intval( $reg->id ); ?>" data-reg-id="<?php echo intval( $reg->id ); ?>">
+                                <td class="ec-col-check"><input type="checkbox" class="ec-row-check" value="<?php echo intval( $reg->id ); ?>"></td>
                                 <td class="ec-col-name">
                                     <strong><?php echo esc_html( $reg->first_name . ' ' . $reg->last_name ); ?></strong>
                                     <?php if ( $reg->signature_data ) : ?>
@@ -1082,8 +1112,11 @@ class Admin {
                                             </button>
                                         <?php endif; ?>
                                         <?php if ( current_user_can( 'ec_download_qr' ) ) : ?>
+                                            <button type="button" class="button button-small ec-btn-view-qr" data-id="<?php echo intval( $reg->id ); ?>" data-name="<?php echo esc_attr( $reg->first_name . ' ' . $reg->last_name ); ?>" title="<?php esc_attr_e( 'View QR Code', 'event-checkin' ); ?>">
+                                                <span class="dashicons dashicons-visibility"></span>
+                                            </button>
                                             <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=ec_download_qr&reg_id=' . $reg->id ), 'ec_download_qr_' . $reg->id ) ); ?>" class="button button-small" title="<?php esc_attr_e( 'Download QR', 'event-checkin' ); ?>">
-                                                <span class="dashicons dashicons-smartphone"></span>
+                                                <span class="dashicons dashicons-download"></span>
                                             </a>
                                         <?php endif; ?>
                                         <?php if ( current_user_can( 'ec_manage_checkin' ) && $reg->status === 'registered' ) : ?>
@@ -1235,6 +1268,37 @@ class Admin {
                         <span class="dashicons dashicons-email" style="vertical-align: text-bottom;"></span>
                         <?php esc_html_e( 'Send Email', 'event-checkin' ); ?>
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- View QR Code Modal -->
+        <div id="ec-modal-qr" class="ec-modal" style="display:none;">
+            <div class="ec-modal-overlay"></div>
+            <div class="ec-modal-content ec-modal-content--small">
+                <div class="ec-modal-header">
+                    <h2><?php esc_html_e( 'QR Code', 'event-checkin' ); ?></h2>
+                    <button type="button" class="ec-modal-close">&times;</button>
+                </div>
+                <div class="ec-modal-body" style="text-align: center;">
+                    <p class="ec-qr-person-name" id="ec-qr-person-name"></p>
+                    <div id="ec-qr-image-wrap" class="ec-qr-image-wrap">
+                        <div class="ec-qr-loading" id="ec-qr-loading">
+                            <span class="spinner is-active" style="float: none;"></span>
+                        </div>
+                        <img id="ec-qr-image" src="" alt="QR Code" style="display:none; max-width: 280px; border: 3px solid #002d72;">
+                    </div>
+                    <input type="hidden" id="ec-qr-reg-id" value="">
+                </div>
+                <div class="ec-modal-footer" style="justify-content: center;">
+                    <button type="button" class="button" id="ec-btn-regenerate-qr">
+                        <span class="dashicons dashicons-update" style="vertical-align: text-bottom;"></span>
+                        <?php esc_html_e( 'Regenerate QR Code', 'event-checkin' ); ?>
+                    </button>
+                    <a href="#" class="button button-primary" id="ec-btn-download-qr-modal" target="_blank">
+                        <span class="dashicons dashicons-download" style="vertical-align: text-bottom;"></span>
+                        <?php esc_html_e( 'Download', 'event-checkin' ); ?>
+                    </a>
                 </div>
             </div>
         </div>
@@ -1689,5 +1753,248 @@ class Admin {
         header( 'Cache-Control: no-cache, no-store, must-revalidate' );
         readfile( $filepath );
         exit;
+    }
+
+    // =========================================================================
+    // View / Regenerate QR Code
+    // =========================================================================
+
+    /**
+     * AJAX: Get QR code image URL for viewing in a modal.
+     */
+    public static function ajax_view_qr() {
+        check_ajax_referer( 'ec_admin_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'ec_download_qr' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized', 'event-checkin' ) ), 403 );
+        }
+
+        $reg_id = absint( $_POST['reg_id'] ?? 0 );
+        if ( ! $reg_id ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid registration ID.', 'event-checkin' ) ) );
+        }
+
+        global $wpdb;
+        $reg = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT r.*, e.title as event_title FROM {$wpdb->prefix}ec_registrations r
+                 JOIN {$wpdb->prefix}ec_events e ON r.event_id = e.id
+                 WHERE r.id = %d",
+                $reg_id
+            )
+        );
+
+        if ( ! $reg ) {
+            wp_send_json_error( array( 'message' => __( 'Registration not found.', 'event-checkin' ) ) );
+        }
+
+        $qr_url = QRCode::get_url( $reg->qr_token );
+        if ( ! $qr_url ) {
+            // Auto-generate if missing.
+            $qr_url = QRCode::generate( $reg->qr_token, $reg->event_id );
+        }
+
+        $download_url = wp_nonce_url(
+            admin_url( 'admin-post.php?action=ec_download_qr&reg_id=' . $reg_id ),
+            'ec_download_qr_' . $reg_id
+        );
+
+        wp_send_json_success( array(
+            'qr_url'       => $qr_url ? $qr_url : '',
+            'download_url' => $download_url,
+            'name'         => $reg->first_name . ' ' . $reg->last_name,
+            'event_title'  => $reg->event_title,
+        ) );
+    }
+
+    /**
+     * AJAX: Regenerate QR code for a registration (deletes old, creates new).
+     */
+    public static function ajax_regenerate_qr() {
+        check_ajax_referer( 'ec_admin_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'ec_download_qr' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized', 'event-checkin' ) ), 403 );
+        }
+
+        $reg_id = absint( $_POST['reg_id'] ?? 0 );
+        if ( ! $reg_id ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid registration ID.', 'event-checkin' ) ) );
+        }
+
+        global $wpdb;
+        $reg = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}ec_registrations WHERE id = %d",
+                $reg_id
+            )
+        );
+
+        if ( ! $reg ) {
+            wp_send_json_error( array( 'message' => __( 'Registration not found.', 'event-checkin' ) ) );
+        }
+
+        // Delete old QR code file.
+        QRCode::delete( $reg->qr_token );
+
+        // Generate new one.
+        $qr_url = QRCode::generate( $reg->qr_token, $reg->event_id );
+
+        if ( ! $qr_url ) {
+            wp_send_json_error( array( 'message' => __( 'Failed to generate QR code.', 'event-checkin' ) ) );
+        }
+
+        $download_url = wp_nonce_url(
+            admin_url( 'admin-post.php?action=ec_download_qr&reg_id=' . $reg_id ),
+            'ec_download_qr_' . $reg_id
+        );
+
+        wp_send_json_success( array(
+            'message'      => __( 'QR code regenerated successfully.', 'event-checkin' ),
+            'qr_url'       => $qr_url,
+            'download_url' => $download_url,
+        ) );
+    }
+
+    // =========================================================================
+    // Bulk Actions
+    // =========================================================================
+
+    /**
+     * AJAX: Handle bulk actions on multiple registrations.
+     */
+    public static function ajax_bulk_action() {
+        check_ajax_referer( 'ec_admin_nonce', 'nonce' );
+
+        $bulk_action = sanitize_key( $_POST['bulk_action'] ?? '' );
+        $reg_ids     = array_map( 'absint', (array) ( $_POST['reg_ids'] ?? array() ) );
+
+        if ( empty( $reg_ids ) || ! $bulk_action ) {
+            wp_send_json_error( array( 'message' => __( 'No registrations selected.', 'event-checkin' ) ) );
+        }
+
+        // Permission check per action type.
+        $permission_map = array(
+            'checkin' => 'ec_manage_checkin',
+            'cancel'  => 'ec_edit_registrations',
+            'resend'  => 'ec_resend_emails',
+        );
+
+        if ( ! isset( $permission_map[ $bulk_action ] ) || ! current_user_can( $permission_map[ $bulk_action ] ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized', 'event-checkin' ) ), 403 );
+        }
+
+        global $wpdb;
+        $table   = $wpdb->prefix . 'ec_registrations';
+        $success = 0;
+        $errors  = 0;
+
+        foreach ( $reg_ids as $reg_id ) {
+            $reg = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $reg_id ) );
+            if ( ! $reg ) {
+                $errors++;
+                continue;
+            }
+
+            switch ( $bulk_action ) {
+                case 'checkin':
+                    if ( $reg->status === 'registered' ) {
+                        $wpdb->update(
+                            $table,
+                            array( 'status' => 'checked_in', 'checked_in_at' => current_time( 'mysql' ) ),
+                            array( 'id' => $reg_id ),
+                            array( '%s', '%s' ),
+                            array( '%d' )
+                        );
+                        $wpdb->insert(
+                            $wpdb->prefix . 'ec_checkin_log',
+                            array(
+                                'registration_id' => $reg_id,
+                                'event_id'        => $reg->event_id,
+                                'action'          => 'bulk_checkin',
+                                'performed_by'    => get_current_user_id(),
+                                'ip_address'      => $_SERVER['REMOTE_ADDR'] ?? '',
+                            ),
+                            array( '%d', '%d', '%s', '%d', '%s' )
+                        );
+                        $success++;
+                    } else {
+                        $errors++;
+                    }
+                    break;
+
+                case 'cancel':
+                    if ( $reg->status !== 'cancelled' ) {
+                        $wpdb->update(
+                            $table,
+                            array( 'status' => 'cancelled' ),
+                            array( 'id' => $reg_id ),
+                            array( '%s' ),
+                            array( '%d' )
+                        );
+                        $success++;
+                    } else {
+                        $errors++;
+                    }
+                    break;
+
+                case 'resend':
+                    $event = $wpdb->get_row( $wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}ec_events WHERE id = %d",
+                        $reg->event_id
+                    ) );
+
+                    if ( $event ) {
+                        $qr_url = QRCode::get_url( $reg->qr_token );
+                        if ( ! $qr_url ) {
+                            $qr_url = QRCode::generate( $reg->qr_token, $reg->event_id );
+                        }
+
+                        $upload_dir = wp_upload_dir();
+                        $qr_file    = $upload_dir['basedir'] . '/event-checkin/qrcodes/qr-' . substr( $reg->qr_token, 0, 16 ) . '.png';
+
+                        $vars = array(
+                            'first_name'     => $reg->first_name,
+                            'last_name'      => $reg->last_name,
+                            'event_title'    => $event->title,
+                            'event_date'     => wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $event->event_date ) ),
+                            'event_location' => $event->location,
+                            'qr_code_url'    => $qr_url ? $qr_url : '',
+                            'site_name'      => get_bloginfo( 'name' ),
+                        );
+
+                        $sent = Email::send( $reg->email, $vars, $qr_file );
+                        if ( $sent ) {
+                            $success++;
+                        } else {
+                            $errors++;
+                        }
+                    } else {
+                        $errors++;
+                    }
+                    break;
+            }
+        }
+
+        $action_labels = array(
+            'checkin' => __( 'checked in', 'event-checkin' ),
+            'cancel'  => __( 'cancelled', 'event-checkin' ),
+            'resend'  => __( 'emailed', 'event-checkin' ),
+        );
+
+        $label = $action_labels[ $bulk_action ] ?? $bulk_action;
+        $message = sprintf(
+            __( 'Bulk action complete: %1$d %2$s successfully, %3$d skipped/failed.', 'event-checkin' ),
+            $success,
+            $label,
+            $errors
+        );
+
+        wp_send_json_success( array(
+            'message' => $message,
+            'success' => $success,
+            'errors'  => $errors,
+            'action'  => $bulk_action,
+        ) );
     }
 }

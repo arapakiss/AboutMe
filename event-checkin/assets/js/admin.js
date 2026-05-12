@@ -364,4 +364,179 @@
         }
     }
 
+    // =========================================================================
+    // View QR Code
+    // =========================================================================
+
+    $(document).on('click', '.ec-btn-view-qr', function () {
+        var regId = $(this).data('id');
+        var name = $(this).data('name');
+
+        $('#ec-qr-reg-id').val(regId);
+        $('#ec-qr-person-name').text(name);
+        $('#ec-qr-image').hide();
+        $('#ec-qr-loading').show();
+
+        openModal('#ec-modal-qr');
+
+        $.post(ecAdmin.ajaxUrl, {
+            action: 'ec_view_qr',
+            nonce: ecAdmin.nonce,
+            reg_id: regId
+        }, function (response) {
+            $('#ec-qr-loading').hide();
+            if (response.success) {
+                var d = response.data;
+                // Add cache-busting param to force reload after regenerate.
+                $('#ec-qr-image').attr('src', d.qr_url + '?t=' + Date.now()).show();
+                $('#ec-btn-download-qr-modal').attr('href', d.download_url);
+            } else {
+                showToast(response.data.message || ecAdmin.i18n.error, 'error');
+                closeModal('#ec-modal-qr');
+            }
+        }).fail(function () {
+            $('#ec-qr-loading').hide();
+            showToast(ecAdmin.i18n.error, 'error');
+        });
+    });
+
+    // Regenerate QR Code.
+    $('#ec-btn-regenerate-qr').on('click', function () {
+        var $btn = $(this);
+        var regId = $('#ec-qr-reg-id').val();
+
+        if (!confirm('Regenerate the QR code? The old image will be replaced.')) {
+            return;
+        }
+
+        $btn.prop('disabled', true);
+        $('#ec-qr-image').hide();
+        $('#ec-qr-loading').show();
+
+        $.post(ecAdmin.ajaxUrl, {
+            action: 'ec_regenerate_qr',
+            nonce: ecAdmin.nonce,
+            reg_id: regId
+        }, function (response) {
+            $btn.prop('disabled', false);
+            $('#ec-qr-loading').hide();
+
+            if (response.success) {
+                var d = response.data;
+                $('#ec-qr-image').attr('src', d.qr_url + '?t=' + Date.now()).show();
+                $('#ec-btn-download-qr-modal').attr('href', d.download_url);
+                showToast(d.message, 'success');
+            } else {
+                showToast(response.data.message || ecAdmin.i18n.error, 'error');
+            }
+        }).fail(function () {
+            $btn.prop('disabled', false);
+            $('#ec-qr-loading').hide();
+            showToast(ecAdmin.i18n.error, 'error');
+        });
+    });
+
+    // =========================================================================
+    // Bulk Selection
+    // =========================================================================
+
+    function updateBulkBar() {
+        var count = $('.ec-row-check:checked').length;
+        $('#ec-bulk-count').text(count);
+        if (count > 0) {
+            $('#ec-bulk-bar').show();
+        } else {
+            $('#ec-bulk-bar').hide();
+        }
+    }
+
+    // Select all checkbox.
+    $('#ec-select-all').on('change', function () {
+        var checked = $(this).is(':checked');
+        $('.ec-row-check').prop('checked', checked);
+        if (checked) {
+            $('.ec-row-check').closest('tr').addClass('ec-row-selected');
+        } else {
+            $('.ec-row-check').closest('tr').removeClass('ec-row-selected');
+        }
+        updateBulkBar();
+    });
+
+    // Individual row checkbox.
+    $(document).on('change', '.ec-row-check', function () {
+        var $row = $(this).closest('tr');
+        if ($(this).is(':checked')) {
+            $row.addClass('ec-row-selected');
+        } else {
+            $row.removeClass('ec-row-selected');
+            $('#ec-select-all').prop('checked', false);
+        }
+
+        // If all are checked, check the select-all too.
+        if ($('.ec-row-check').length === $('.ec-row-check:checked').length && $('.ec-row-check').length > 0) {
+            $('#ec-select-all').prop('checked', true);
+        }
+
+        updateBulkBar();
+    });
+
+    // Deselect all.
+    $('#ec-bulk-deselect').on('click', function () {
+        $('.ec-row-check').prop('checked', false);
+        $('#ec-select-all').prop('checked', false);
+        $('tr').removeClass('ec-row-selected');
+        updateBulkBar();
+    });
+
+    // =========================================================================
+    // Bulk Actions
+    // =========================================================================
+
+    $(document).on('click', '.ec-bulk-btn', function () {
+        var action = $(this).data('action');
+        var regIds = [];
+
+        $('.ec-row-check:checked').each(function () {
+            regIds.push($(this).val());
+        });
+
+        if (regIds.length === 0) {
+            showToast('No registrations selected.', 'error');
+            return;
+        }
+
+        var confirmMessages = {
+            checkin: 'Check in ' + regIds.length + ' selected registration(s)?',
+            cancel: 'Cancel ' + regIds.length + ' selected registration(s)? This cannot be easily undone.',
+            resend: 'Resend confirmation email to ' + regIds.length + ' selected registration(s)?'
+        };
+
+        if (!confirm(confirmMessages[action] || 'Proceed with bulk action?')) {
+            return;
+        }
+
+        var $btn = $(this);
+        $btn.prop('disabled', true);
+
+        $.post(ecAdmin.ajaxUrl, {
+            action: 'ec_bulk_action',
+            nonce: ecAdmin.nonce,
+            bulk_action: action,
+            reg_ids: regIds
+        }, function (response) {
+            $btn.prop('disabled', false);
+
+            if (response.success) {
+                showToast(response.data.message, 'success');
+                // Reload page to reflect changes.
+                setTimeout(function () { location.reload(); }, 1200);
+            } else {
+                showToast(response.data.message || ecAdmin.i18n.error, 'error');
+            }
+        }).fail(function () {
+            $btn.prop('disabled', false);
+            showToast(ecAdmin.i18n.error, 'error');
+        });
+    });
+
 })(jQuery);

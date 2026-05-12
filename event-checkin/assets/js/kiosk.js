@@ -173,9 +173,17 @@
             text = text.trim();
             console.log('[EC] Scanned content:', text.substring(0, 80) + (text.length > 80 ? '...' : ''));
 
-            // Method 1: Try to extract from URL parameter.
+            // Method 1: Try to extract from URL (path-based or query param).
             try {
                 var url = new URL(text);
+
+                // New format: /ec/TOKEN path-based URL (scan-friendly).
+                var pathMatch = url.pathname.match(/\/ec\/([a-f0-9]{64})$/i);
+                if (pathMatch) {
+                    return pathMatch[1];
+                }
+
+                // Legacy format: ?ec_token=TOKEN query parameter.
                 var token = url.searchParams.get('ec_token');
                 if (token && /^[a-f0-9]{64}$/i.test(token)) {
                     console.log('[EC] Token extracted from URL parameter');

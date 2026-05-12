@@ -686,3 +686,111 @@
     0% { background: rgba(11, 171, 228, 0.2); }
     100% { background: transparent; }
 }
+
+/* =========================================================================
+   Checkbox Column & Bulk Actions
+   ========================================================================= */
+
+.ec-col-check {
+    width: 36px !important;
+    text-align: center;
+}
+
+.ec-col-check input[type="checkbox"] {
+    margin: 0;
+}
+
+.ec-col-actions {
+    width: 220px;
+}
+
+/* Selected row highlight */
+.ec-row-selected {
+    background: rgba(11, 171, 228, 0.06) !important;
+}
+
+/* Bulk actions bar */
+.ec-bulk-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    background: #002d72;
+    color: #fff;
+    animation: ec-slide-down 0.2s ease;
+}
+
+@keyframes ec-slide-down {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.ec-bulk-count {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.ec-bulk-count strong {
+    font-size: 16px;
+    color: #0babe4;
+}
+
+.ec-bulk-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.ec-bulk-buttons .button {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: #fff !important;
+    background: transparent !important;
+}
+
+.ec-bulk-buttons .button:hover {
+    border-color: #fff !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ec-bulk-buttons .button .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    vertical-align: text-bottom;
+}
+
+/* =========================================================================
+   QR Code Modal
+   ========================================================================= */
+
+.ec-qr-image-wrap {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+.ec-qr-person-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #002d72;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0 0 4px;
+}
+
+.ec-qr-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.ec-btn-view-qr .dashicons { color: #8b5cf6; }
+
+#ec-btn-regenerate-qr .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}

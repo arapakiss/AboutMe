@@ -31,6 +31,7 @@ $tables = array(
     $wpdb->prefix . 'ec_registrations',
     $wpdb->prefix . 'ec_events',
     $wpdb->prefix . 'ec_rate_limits',
+    $wpdb->prefix . 'ec_verifications',
 );
 
 foreach ( $tables as $table ) {
@@ -41,6 +42,9 @@ foreach ( $tables as $table ) {
 delete_option( 'ec_db_version' );
 delete_option( 'ec_settings' );
 delete_option( 'ec_default_form_page_id' );
+delete_option( 'ec_email_template' );
+delete_option( 'ec_email_subject' );
+delete_option( 'ec_email_queue' );
 
 // Remove per-event options (form pages, translations).
 $wpdb->query(

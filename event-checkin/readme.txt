@@ -19,6 +19,8 @@ Event Check-in is a complete event registration and attendance management plugin
 * **Self-Service Kiosk Mode** - Fullscreen tablet interface for attendee self check-in
 * **Digital Signatures** - Optional signature capture during check-in
 * **Excel/CSV Export** - Export all registration and attendance data
+* **Event Dashboard** - Per-event management with stats, search, filter, bulk actions
+* **Mobile Staff App** - Phone-friendly guest list, QR scanner, add guest, check-in history
 * **Three User Layers** - Admin, Staff, and Public user roles
 
 = How It Works =
@@ -51,6 +53,7 @@ Event Check-in is a complete event registration and attendance management plugin
 
 * `[event_registration id="123"]` - Renders the registration form for event ID 123
 * `[event_kiosk id="123"]` - Renders the kiosk check-in interface (staff/admin only)
+* `[event_staff_app id="123"]` - Mobile-first staff app with guest list, QR scanner, add guest, and check-in history (staff/admin only)
 
 = Does the kiosk mode require internet? =
 
@@ -72,9 +75,17 @@ Yes, each event can have custom fields (text, textarea, select, checkbox) in add
 * NEW: Add registrations manually from the dashboard
 * NEW: Resend confirmation email to original or alternate address
 * NEW: Download individual QR codes as PNG files
+* NEW: View QR code in a modal with full-size preview
+* NEW: Regenerate QR code (delete old, create fresh) from the QR modal
+* NEW: Bulk actions - select multiple registrations for bulk check-in, cancel, or resend email
 * NEW: Manual check-in and cancel from dashboard
 * NEW: Toast notifications for all dashboard actions
 * NEW: Staff role capabilities for edit, resend email, download QR, and dashboard access
+* NEW: Mobile Staff App shortcode `[event_staff_app]` - phone-friendly guest management
+* NEW: Staff App guest list with search, filter, and one-tap check-in/undo
+* NEW: Staff App QR scanner with guest profile overlay
+* NEW: Staff App add-guest form with duplicate detection
+* NEW: Staff App check-in history log with performer tracking
 * FIX: QR scanner recognition - lowered error correction from H to M for less dense codes
 * FIX: Disabled browser BarcodeDetector API that caused false negatives on some devices
 * FIX: Removed forced 1:1 aspect ratio that cropped camera feed on some devices

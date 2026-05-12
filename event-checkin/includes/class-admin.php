@@ -115,7 +115,12 @@ class Admin {
             'admin_page_ec-event-dashboard',
         );
 
-        if ( ! in_array( $hook, $ec_pages, true ) ) {
+        // Also match if the hook contains our slug (handles varying WP hook formats).
+        $is_ec_page = in_array( $hook, $ec_pages, true )
+                      || strpos( $hook, 'ec-event-dashboard' ) !== false
+                      || strpos( $hook, 'ec-registrations' ) !== false;
+
+        if ( ! $is_ec_page ) {
             return;
         }
 

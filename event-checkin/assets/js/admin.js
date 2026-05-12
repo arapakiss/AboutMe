@@ -59,25 +59,29 @@
     // =========================================================================
 
     function openModal(id) {
-        $(id).show();
+        $(id).css('display', 'flex');
         $('body').css('overflow', 'hidden');
     }
 
     function closeModal(id) {
-        $(id).hide();
+        $(id).css('display', 'none');
         $('body').css('overflow', '');
     }
 
     // Close modals on overlay click or close button.
     $(document).on('click', '.ec-modal-overlay, .ec-modal-close', function () {
-        $(this).closest('.ec-modal').hide();
+        $(this).closest('.ec-modal').css('display', 'none');
         $('body').css('overflow', '');
     });
 
     // Close modal on Escape key.
     $(document).on('keydown', function (e) {
         if (e.key === 'Escape') {
-            $('.ec-modal:visible').hide();
+            $('.ec-modal').each(function () {
+                if ($(this).css('display') !== 'none') {
+                    $(this).css('display', 'none');
+                }
+            });
             $('body').css('overflow', '');
         }
     });
